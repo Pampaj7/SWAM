@@ -1,6 +1,6 @@
 
 % Leggi il dataset CSV
-data = readtable('../../datasets/breastcancer/breastcancer.csv');
+data = readtable('../../../datasets/breastcancer/breastcancer.csv');
 
 % Conversione della diagnosi in binario (M=1, B=0)
 data.diagnosis = strcmp(data.diagnosis, 'M');
@@ -17,8 +17,12 @@ y_train = trainData.diagnosis;
 X_test = testData{:, 3:end};
 y_test = testData.diagnosis;
 
+% Opzioni di controllo per il modello di regressione logistica
+options = statset('glmfit');
+options.MaxIter = 100;  % Aumenta il numero massimo di iterazioni
+
 % Addestramento del modello di regressione logistica
-mdl = fitglm(X_train, y_train, 'Distribution', 'binomial', 'Link', 'logit');
+mdl = fitglm(X_train, y_train, 'Distribution', 'binomial', 'Link', 'logit', 'LikelihoodPenalty', 'Jeffreys');
 
 % Fare previsioni sul set di test
 y_pred = round(predict(mdl, X_test));
