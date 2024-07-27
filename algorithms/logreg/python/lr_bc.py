@@ -3,9 +3,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
- #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>CAMBIA IL PERCORSO
 def logreg():
-    csv_file_path = "/home/alessandro/PycharmProjects/SWAM/datasets/breastcancer/breastcancer.csv"
+    csv_file_path = "../../../datasets/breastcancer/breastcancer.csv"
     data = pd.read_csv(csv_file_path)
 
     # Verifica dei dati di input

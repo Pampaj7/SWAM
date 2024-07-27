@@ -3,15 +3,15 @@ import matlab.engine
 from python import lr_bc as lr
 
 
-def run_matlab_script():
+def run_matlab_script(path):
     # chatgpt is dumb
     eng = matlab.engine.start_matlab()
-    eng.run("matlab/lr_bc.m", nargout=0)
+    eng.run(path, nargout=0)
     eng.quit()
 
 
-def run_r_script():
-    result = subprocess.run(["Rscript", "r/lr_bc.r"], capture_output=True, text=True)
+def run_r_script(path):
+    result = subprocess.run(["Rscript", path], capture_output=True, text=True)
     print("R script output:")
     print(result.stdout)
     print(result.stderr)
@@ -19,12 +19,13 @@ def run_r_script():
 
 print("-----------------------")
 print("Running R script...")
-run_r_script()
+run_r_script("r/lr_bc.r")
 print("-----------------------")
 print("-----------------------")
 
 print("Running MATLAB script...")
-run_matlab_script()
+run_matlab_script("matlab/lr_bc.m")
+run_matlab_script("../decisionTree/matlab/dt_bc.m")
 print("-----------------------")
 print("-----------------------")
 
