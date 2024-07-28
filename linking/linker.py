@@ -1,5 +1,6 @@
 import subprocess
 import matlab.engine
+from codecarbon import EmissionsTracker
 
 
 def run_r_script():
@@ -70,14 +71,24 @@ def run_cpp_program():
 
 
 if __name__ == "__main__":
+    tracker = EmissionsTracker()
+
     print("Esecuzione script R:")
+    tracker.start()
     run_r_script()
+    tracker.stop()
 
     print("\nEsecuzione script MATLAB:")
+    tracker.start()
     run_matlab_script()
+    tracker.stop()
 
     print("\nEsecuzione programma Java:")
+    tracker.start()
     run_java_program()
+    tracker.stop()
 
     print("\nEsecuzione programma C++:")
+    tracker.start()
     run_cpp_program()
+    tracker.stop()

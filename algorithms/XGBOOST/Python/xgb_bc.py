@@ -1,14 +1,13 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
+from sklearn.metrics import accuracy_score, classification_report
+
 import xgboost as xgb
+
 
 def XGBOOST():
     # Load the dataset
-    data = pd.read_csv('/home/alessandro/PycharmProjects/SWAM/datasets/breastcancer/breastcancer.csv')
+    data = pd.read_csv('../../../datasets/breastcancer/breastcancer.csv')
 
     # Data processing
     X = data.drop(columns=["diagnosis"])
@@ -34,5 +33,6 @@ def XGBOOST():
     print(f"\nAccuracy: {accuracy}")
     print("\nClassification Report:")
     print(class_report)
+
 
 XGBOOST()

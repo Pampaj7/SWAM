@@ -3,8 +3,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
+
 def logreg():
-    csv_file_path = "../../../datasets/breastcancer/breastcancer.csv"
+    csv_file_path = "/Users/pampaj/PycharmProjects/SWAM/datasets/breastcancer/breastcancer.csv"
     data = pd.read_csv(csv_file_path)
 
     # Verifica dei dati di input
@@ -24,9 +25,7 @@ def logreg():
     print(f"\nTraining set size: {X_train.shape[0]} samples")
     print(f"Test set size: {X_test.shape[0]} samples")
 
-
     model = LogisticRegression(max_iter=10000)
-
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
@@ -34,7 +33,6 @@ def logreg():
     # Verifica delle predizioni
     print(f"\nTrue labels: {y_test.values[:10]}")
     print(f"Predicted labels: {y_pred[:10]}")
-
 
     accuracy = accuracy_score(y_test, y_pred)
     class_report = classification_report(y_test, y_pred)
