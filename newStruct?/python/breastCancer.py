@@ -1,8 +1,7 @@
-import pandas as pd
 from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
@@ -76,8 +75,8 @@ def getGraphics():
     plt.figure(figsize=(12, 6))
     sns.lineplot(x='emissions', y='duration', data=df, marker='o')
     plt.title('Emissioni di CO2 nel Tempo')
-    plt.xlabel('Timestamp')
-    plt.ylabel('Emissioni di CO2 (kg)')
+    plt.xlabel('emission')
+    plt.ylabel('duration')
     plt.grid(True)
     plt.show()
 
