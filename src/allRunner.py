@@ -4,8 +4,15 @@ from codecarbon import EmissionsTracker
 
 
 def run_r_script():
-    result = subprocess.run(["Rscript", "script.R"], capture_output=True, text=True)
+    result = subprocess.run(["Rscript", ""], capture_output=True, text=True)
     print("R script output:")
+    print(result.stdout)
+    print(result.stderr)
+
+
+def run_python():
+    result = subprocess.run(["python", "python/pythonRunner.py"], capture_output=True, text=True)
+    print("Python script output:")
     print(result.stdout)
     print(result.stderr)
 
@@ -13,7 +20,7 @@ def run_r_script():
 def run_matlab_script():
     # chatgpt is dumb
     eng = matlab.engine.start_matlab()
-    eng.run('script.m', nargout=0)
+    eng.run('matlab/runAlgorithm.m', nargout=0)
     eng.quit()
 
 
@@ -72,17 +79,17 @@ def run_cpp_program():
 
 if __name__ == "__main__":
     tracker = EmissionsTracker()
-
+    """
     print("Esecuzione script R:")
     tracker.start()
     run_r_script()
     tracker.stop()
-
-    print("\nEsecuzione script MATLAB:")
+    """
+    print("\nEsecuzione matlabRunner:")
     tracker.start()
     run_matlab_script()
     tracker.stop()
-
+    """
     print("\nEsecuzione programma Java:")
     tracker.start()
     run_java_program()
@@ -91,4 +98,9 @@ if __name__ == "__main__":
     print("\nEsecuzione programma C++:")
     tracker.start()
     run_cpp_program()
+    tracker.stop()
+    """
+    print("\nEsecuzione script Python:")
+    tracker.start()
+    run_python()
     tracker.stop()

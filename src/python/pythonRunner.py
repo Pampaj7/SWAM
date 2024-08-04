@@ -25,7 +25,7 @@ algorithms = {
 }
 
 
-def run_algorithms(X, y, epochs=1):
+def run_algorithms(X, y, epochs=10):
     results = {name: {'accuracy': 0, 'emissions': 0} for name in algorithms.values()}
 
     # Divisione dei dati in set di addestramento e di test
