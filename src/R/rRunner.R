@@ -9,10 +9,13 @@ print(head(data))   # Print the first few rows
 print(names(data))  # Print the column names
 
 # Create a simple plot - for example, a scatter plot of 'radius_mean' vs 'texture_mean' colored by 'diagnosis'
-ggplot(data, aes(x = radius_mean, y = texture_mean, color = diagnosis)) +
+plot <- ggplot(data, aes(x = radius_mean, y = texture_mean, color = diagnosis)) +
   geom_point() +
   labs(title = "Radius Mean vs. Texture Mean",
        x = "Radius Mean",
        y = "Texture Mean",
        color = "Diagnosis") +
   theme_minimal()
+
+# Save the plot as an image
+ggsave("radius_vs_texture.png", plot = plot, width = 8, height = 6, dpi = 300, bg = "white")
