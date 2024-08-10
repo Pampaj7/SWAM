@@ -1,10 +1,10 @@
 import subprocess
-import matlab.engine
+# import matlab.engine
 from codecarbon import EmissionsTracker
 
 
 def run_r_script():
-    result = subprocess.run(["Rscript", ""], capture_output=True, text=True)
+    result = subprocess.run(["Rscript", "R/rRunner.R"], capture_output=True, text=True)
     print("R script output:")
     print(result.stdout)
     print(result.stderr)
@@ -79,28 +79,27 @@ def run_cpp_program():
 
 if __name__ == "__main__":
     tracker = EmissionsTracker()
-    """
+
     print("Esecuzione script R:")
     tracker.start()
     run_r_script()
     tracker.stop()
-    """
-    print("\nEsecuzione matlabRunner:")
-    tracker.start()
-    run_matlab_script()
-    tracker.stop()
-    """
-    print("\nEsecuzione programma Java:")
-    tracker.start()
-    run_java_program()
-    tracker.stop()
 
-    print("\nEsecuzione programma C++:")
-    tracker.start()
-    run_cpp_program()
-    tracker.stop()
-    """
-    print("\nEsecuzione script Python:")
-    tracker.start()
-    run_python()
-    tracker.stop()
+    # print("\nEsecuzione matlabRunner:")
+    # tracker.start()
+    # run_matlab_script()
+    # tracker.stop()
+    #
+    # print("\nEsecuzione programma Java:")
+    # tracker.start()
+    # run_java_program()
+    # tracker.stop()
+    #
+    # print("\nEsecuzione programma C++:")
+    # tracker.start()
+    # run_cpp_program()
+    # tracker.stop()
+    # print("\nEsecuzione script Python:")
+    # tracker.start()
+    # run_python()
+    # tracker.stop()
