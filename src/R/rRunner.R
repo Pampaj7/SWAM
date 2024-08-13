@@ -48,9 +48,9 @@ train_random_forest <- function(data, target, train_split = 0.8, ntree = 100, mt
   return(list(model = rfModel, confusion_matrix = confMatrix))
 }
 
-rfIris = train_random_forest(data = dataIris, target = "Species")
-rfCancer = train_random_forest(data = dataBreastCancer, target = "diagnosis")
-rfWine = train_random_forest(data = dataWine, target = "type")
+rfIris <- train_random_forest(data = dataIris, target = "Species")
+rfCancer <- train_random_forest(data = dataBreastCancer, target = "diagnosis")
+rfWine <- train_random_forest(data = dataWine, target = "type")
 
 
 train_decision_tree <- function(data, target, train_split = 0.8, minsplit = 20, cp = 0.01, seed = 42) {
