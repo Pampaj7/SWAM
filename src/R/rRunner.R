@@ -12,9 +12,9 @@ library(mclust)
 
 
 
-dataIris = read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/iris/iris.csv")
-dataBreastCancer = read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/breastcancer/breastcancer.csv")
-dataWine = read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/winequality/wine_data.csv")
+dataIris <- read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/iris/iris.csv")
+dataBreastCancer <- read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/breastcancer/breastcancer.csv")
+dataWine <- read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/winequality/wine_data.csv")
 set.seed(42)
 
 
