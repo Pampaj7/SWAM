@@ -10,12 +10,12 @@ library(xgboost)
 library(e1071)
 library(mclust)
 
+set.seed(42)
 
 
 dataIris <- read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/iris/iris.csv")
 dataBreastCancer <- read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/breastcancer/breastcancer.csv")
 dataWine <- read.csv("/Users/pippodima/PycharmProjects/SWAM/datasets/winequality/wine_data.csv")
-set.seed(42)
 
 
 train_random_forest <- function(data, target, train_split = 0.8, ntree = 100, mtry = 3, seed=42) {
@@ -47,12 +47,6 @@ train_random_forest <- function(data, target, train_split = 0.8, ntree = 100, mt
   # Return the trained model and the confusion matrix
   return(list(model = rfModel, confusion_matrix = confMatrix))
 }
-
-rfIris <- train_random_forest(data = dataIris, target = "Species")
-rfCancer <- train_random_forest(data = dataBreastCancer, target = "diagnosis")
-rfWine <- train_random_forest(data = dataWine, target = "type")
-
-
 train_decision_tree <- function(data, target, train_split = 0.8, minsplit = 20, cp = 0.01, seed = 42) {
   # Convert the target column to a factor if it's not numeric
   if(!is.numeric(data[[target]])) {
@@ -88,12 +82,6 @@ train_decision_tree <- function(data, target, train_split = 0.8, minsplit = 20, 
   # Return the trained model and the performance metrics
   return(list(model = dtModel, performance = if (is.factor(data[[target]])) confMatrix else rmse))
 }
-
-dtIris=train_decision_tree(data = dataIris, target = "Species")
-dtCancer=train_decision_tree(data = dataBreastCancer, target = "diagnosis")
-dtWine=train_decision_tree(data = dataWine, target = "type")
-
-
 train_knn <- function(data, target, train_split = 0.8, k = 5, seed = 42) {
   # Convert the target column to a factor if it's not numeric
   if (!is.numeric(data[[target]])) {
@@ -129,12 +117,6 @@ train_knn <- function(data, target, train_split = 0.8, k = 5, seed = 42) {
   # Return the performance metrics
   return(if (is.factor(data[[target]])) confMatrix else rmse)
 }
-
-knnIris = train_knn(data = dataIris, target = "Species")
-knnCancer = train_knn(data = dataBreastCancer, target = "diagnosis")
-knnWine = train_knn(data = dataWine, target = "type")
-
-
 train_logistic_regression <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
   data[[target]] <- as.factor(data[[target]])
@@ -188,12 +170,6 @@ train_logistic_regression <- function(data, target, train_split = 0.8, seed = 42
     confusion_matrix = confusion_matrix
   ))
 }
-
-lrIris = train_logistic_regression(data = dataIris, target = "Species")
-lrCancer = train_logistic_regression(data = dataBreastCancer, target = "diagnosis")
-lrWine = train_logistic_regression(data = dataWine, target = "type")
-
-
 train_xgboost_classifier <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
   data[[target]] <- as.factor(data[[target]])
@@ -256,11 +232,6 @@ train_xgboost_classifier <- function(data, target, train_split = 0.8, seed = 42)
     confusion_matrix = confusion_matrix
   ))
 }
-
-xgbIris = train_xgboost_classifier(data = dataIris, target = "Species")
-xgbCancer = train_xgboost_classifier(data = dataBreastCancer, target = "diagnosis")
-xgbWine = train_xgboost_classifier(data = dataWine, target = "type")
-
 train_svc_classifier <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
   data[[target]] <- as.factor(data[[target]])
@@ -313,11 +284,6 @@ train_svc_classifier <- function(data, target, train_split = 0.8, seed = 42) {
     confusion_matrix = confusion_matrix
   ))
 }
-
-svcIris = train_svc_classifier(data = dataIris, target = "Species")
-svcCancer = train_svc_classifier(data = dataBreastCancer, target = "diagnosis")
-svcWine = train_svc_classifier(data = dataWine, target = "type")
-
 train_gaussian_mixture <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
   data[[target]] <- as.factor(data[[target]])
@@ -359,9 +325,31 @@ train_gaussian_mixture <- function(data, target, train_split = 0.8, seed = 42) {
   ))
 }
 
-gmIris = train_gaussian_mixture(data = dataIris, target = "Species")
-gmCancer = train_gaussian_mixture(data = dataBreastCancer, target = "diagnosis")
-gmWine = train_gaussian_mixture(data = dataWine, target = "type")
+run_model_with_dataset <- function(datasetName, algorithmName){
+  dataset <- switch (datasetName,
+    "iris" = list(data = dataIris, target = "Species"),
+    "breastCancer" = list(data = dataBreastCancer, target = "diagnosis"),
+    "wine" = list(data = dataWine, target = "type"),
+    stop("invalid dataset name")
+  )
+  dataMatrix <- dataset$data
+  targetValue <- dataset$target
+
+  result <- switch (algorithmName,
+    "randomForest" = train_random_forest(data = dataMatrix, target = targetValue),
+    "decisionTree" = train_decision_tree(data = dataMatrix, target = targetValue),
+    "KNN" = train_knn(data = dataMatrix, target = targetValue),
+    "logisticRegression" = train_logistic_regression(data = dataMatrix, target = targetValue),
+    "XGBoost" = train_xgboost_classifier(data = dataMatrix, target = targetValue),
+    "SVC" = train_svc_classifier(data = dataMatrix, target = targetValue),
+    "gaussianMixture" = train_gaussian_mixture(data = dataMatrix, target = targetValue),
+    stop("invalid algorithm name")
+  )
+  return(result)
+}
+
+# run_model_with_dataset(datasetName, algorithmName)
+
 
 
 
