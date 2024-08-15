@@ -2,9 +2,21 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
+from codecarbon import EmissionsTracker
+
+
+def add_emission_info(file_path, algorithm_name, dataset_name):
+    df = pd.read_csv(file_path)
+    df["Algorithm"] = algorithm_name
+    df["Dataset"] = dataset_name
+    df.to_csv(file_path, index=False)
 
 
 def logreg():
+    # Avvia il monitoraggio delle emissioni
+    emissions_tracker = EmissionsTracker(output_dir=".", output_file="emissions.csv")
+    emissions_tracker.start()
+
     csv_file_path = "/Users/pampaj/PycharmProjects/SWAM/datasets/breastcancer/breastcancer.csv"
     data = pd.read_csv(csv_file_path)
 
@@ -41,3 +53,10 @@ def logreg():
     print("Classification Report:")
     print(class_report)
 
+    # Ferma il monitoraggio delle emissioni
+    emissions_tracker.stop()
+
+    add_emission_info("emissions.csv", "Logistic Regression", "Breast Cancer")
+
+
+logreg()

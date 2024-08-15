@@ -13,6 +13,8 @@ from codecarbon import EmissionsTracker
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+epochs = 10
+
 # Definizione degli algoritmi
 algorithms = {
     LogisticRegression(random_state=42, max_iter=10000, class_weight='balanced'): "Logistic Regression",
@@ -25,68 +27,47 @@ algorithms = {
 }
 
 
-def run_algorithms(X, y, epochs=10):
+def run_algorithms(X, y, dataset_name):
     results = {name: {'accuracy': 0, 'emissions': 0} for name in algorithms.values()}
 
     # Divisione dei dati in set di addestramento e di test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-    # Ciclo sulle epoche
-    for epoch in range(epochs):
-        print(f"Epoch {epoch + 1}/{epochs}")
+    for model, name in algorithms.items():
+        print(f"Esecuzione dell'algoritmo: {name} sul dataset: {dataset_name}")
 
-        # Ciclo sugli algoritmi
-        for model, name in algorithms.items():
-            tracker = EmissionsTracker()
+        file_name = "combined_emissions.csv"
+
+        # Itera su ciascuna epoca
+        for epoch in range(epochs):
+            print(f"Epoch {epoch + 1}/{epochs}")
+
+            tracker = EmissionsTracker(output_dir='.', output_file=file_name)
             tracker.start()
 
-            if name == "Gaussian Mixture Model":
-                model.fit(X_train)
-                y_pred = model.predict(X_test)
-            else:
-                model.fit(X_train, y_train)
-                y_pred = model.predict(X_test)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
 
             emissions = tracker.stop()
+
+            if emissions is None:
+                emissions = 0
+
             accuracy = accuracy_score(y_test, y_pred)
 
             results[name]['accuracy'] += accuracy
             results[name]['emissions'] += emissions
 
-    # Calcolare la media delle accuratezze
-    for name in results:
+            # Aggiunge i dati al file esistente
+
         results[name]['accuracy'] /= epochs
+        results[name]['emissions'] /= epochs
+
         print(
-            f"{name} Average Accuracy: {results[name]['accuracy']:.4f}, Total Emissions: {results[name]['emissions']:.4f} kg CO2")
+            f"{name} Average Accuracy: {results[name]['accuracy']:.4f}, Average Emissions: {results[name]['emissions']:.4f} kg CO2")
 
     return results
 
-
-def getGraphics(results):
-    # Creare un DataFrame dei risultati per il grafico
-    results_df = pd.DataFrame(results).T
-    results_df.reset_index(inplace=True)
-    results_df.columns = ['Algorithm', 'accuracy', 'emissions']
-
-    # Plot emissioni per algoritmo
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='Algorithm', y='emissions', data=results_df)
-    plt.title('Emissioni di CO2 per Algoritmo')
-    plt.xlabel('Algoritmo')
-    plt.ylabel('Emissioni di CO2 (kg)')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-
-    # Plot accuratezza per algoritmo
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='Algorithm', y='accuracy', data=results_df)
-    plt.title('Accuratezza per Algoritmo')
-    plt.xlabel('Algoritmo')
-    plt.ylabel('Accuratezza')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
 
 
 def breastCancerAlgos():
@@ -104,8 +85,7 @@ def breastCancerAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y)
-    getGraphics(results)
+    results = run_algorithms(X, y, dataset_name='Breast Cancer')
 
 
 def irisAlgos():
@@ -127,8 +107,7 @@ def irisAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y)
-    getGraphics(results)
+    results = run_algorithms(X, y, dataset_name='Iris')
 
 
 def wineQualityAlgos():
@@ -150,8 +129,50 @@ def wineQualityAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y)
-    getGraphics(results)
+    results = run_algorithms(X, y, dataset_name='Wine Quality')
+
+
+def add_columns(file_path):
+    df = pd.read_csv(file_path)
+
+    # Creazione delle colonne vuote
+    df["Algorithm"] = ""
+    df["Dataset"] = ""
+
+    # Lista degli algoritmi in ordine
+    algorithms_order = [
+        "Logistic Regression",
+        "XGBoost",
+        "Decision Tree",
+        "Random Forest",
+        "K-Nearest Neighbors",
+        "Support Vector Machine",
+        "Gaussian Mixture Model"
+    ]
+
+    # Lista dei dataset in ordine
+    datasets_order = [
+        "Breast Cancer",
+        "Iris",
+        "Wine Quality"
+    ]
+
+    num_algorithms = len(algorithms_order)
+    dataset_size = num_algorithms * epochs  # Calcolo delle righe occupate da ciascun dataset
+
+    # Assegna i valori alle righe
+    for dataset_index, dataset_name in enumerate(datasets_order):
+        start_dataset_row = dataset_index * dataset_size
+
+        for i, algorithm in enumerate(algorithms_order):
+            start_row = start_dataset_row + i * epochs
+            end_row = start_row + epochs
+
+            df.loc[start_row:end_row - 1, "Algorithm"] = algorithm
+            df.loc[start_row:end_row - 1, "Dataset"] = dataset_name
+
+    # Salva il file CSV con le nuove colonne
+    df.to_csv(file_path, index=False)
 
 
 breastCancerAlgos()
@@ -159,3 +180,5 @@ breastCancerAlgos()
 irisAlgos()
 
 wineQualityAlgos()
+
+add_columns("combined_emissions.csv")
