@@ -17,20 +17,23 @@ def run_model_with_dataset(dataset_name, algorithm_name):
 
 
 if __name__ == "__main__":
-    tracker = EmissionsTracker()
+    datasets = ["breastCancer", "wine", "iris"]
+    algorithms = ["logisticRegression", "XGBoost", "decisionTree", "randomForest", "KNN", "SVC", "gaussianMixture"]
 
-    # Example parameters
-    dataset_name = "iris"  # Change this as needed
-    algorithm_name = "randomForest"  # Change this as needed
+    for dataset in datasets:
+        for algorithm in algorithms:
+            tracker = EmissionsTracker()
 
-    print("Executing R script:")
-    tracker.start()
+            print("Executing R script:")
+            print(f"with {dataset} , {algorithm}")
 
-    # Run the model and capture the result
-    result = run_model_with_dataset(dataset_name, algorithm_name)
+            tracker.start()
 
-    tracker.stop()
+            # Run the model and capture the result
+            result = run_model_with_dataset(dataset, algorithm)
 
-    # Print the result
-    print("R function output:")
-    print(result)
+            tracker.stop()
+
+            # Print the result
+            print("R function output:")
+            print(result)
