@@ -1,1 +1,1 @@
-brew install mlpack
+brew install xgboost

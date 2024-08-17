@@ -1,0 +1,4 @@
+cd into directory eg /algorithm/logreg/c++
+cmake .
+cmake --build .
+./src/divider
