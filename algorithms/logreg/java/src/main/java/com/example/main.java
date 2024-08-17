@@ -77,7 +77,7 @@ public class main {
   public static List<Integer> y = new ArrayList<>();
 
   public static void main(String[] args) {
-    String datasetPath = "/Users/niccolomarini/Documents/GitHub/SWAM/datasets/breastcancer/breastcancer.csv";
+    String datasetPath = "../../../datasets/breastcancer/breastcancer.csv";
     loadData(datasetPath);
 
     // Split data into train and test sets (simple 80-20 split)
@@ -88,7 +88,7 @@ public class main {
     List<Integer> yTest = y.subList(splitIndex, y.size());
 
     // Create and train the model
-    LogisticRegression model = new LogisticRegression(X.get(0).length, 0.01, 1000);
+    LogisticRegression model = new LogisticRegression(X.get(0).length, 0.001, 10000);
     model.fit(XTrain, yTrain);
 
     // Make predictions
