@@ -1,91 +1,55 @@
 package com.example;
 
-import org.apache.spark.ml.Pipeline;
-import org.apache.spark.ml.PipelineModel;
-import org.apache.spark.ml.PipelineStage;
-import org.apache.spark.ml.classification.RandomForestClassifier;
-import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
-import org.apache.spark.ml.feature.IndexToString;
-import org.apache.spark.ml.feature.StringIndexer;
-import org.apache.spark.ml.feature.VectorAssembler;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import weka.classifiers.Evaluation;
+import weka.classifiers.trees.RandomForest;
+import weka.core.Instances;
+import weka.core.converters.CSVLoader;
+import weka.core.converters.ConverterUtils.DataSource;
+import weka.core.Attribute;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class main {
-  public static void main(String[] args) {
-    // Create a SparkSession
-    SparkSession spark = SparkSession.builder()
-        .appName("BreastCancerRandomForest")
-        .master("local[*]")
-        .getOrCreate();
-    spark.sparkContext().setLogLevel("ERROR");
+  public static void main(String[] args) throws Exception {
+    // Load the dataset
+    CSVLoader loader = new CSVLoader();
+    loader.setSource(new File("../../../datasets/breastcancer/breastcancer.csv"));
+    Instances data = loader.getDataSet();
 
-    // Load the CSV data
-    Dataset<Row> data = spark.read()
-        .option("header", "true")
-        .option("inferSchema", "true")
-        .csv("../../../datasets/breastcancer/breastcancer.csv");
+    // Assuming "diagnosis" is the last attribute and needs to be mapped to 0 and 1
+    // Make sure to set the class index accordingly
+    data.setClassIndex(1);
 
-    // Define feature columns
-    String[] featureColumns = {
-        "radius_mean", "texture_mean", "perimeter_mean", "area_mean", "smoothness_mean",
-        "compactness_mean", "concavity_mean", "concave_points_mean", "symmetry_mean",
-        "fractal_dimension_mean", "radius_se", "texture_se", "perimeter_se", "area_se",
-        "smoothness_se", "compactness_se", "concavity_se", "concave_points_se",
-        "symmetry_se", "fractal_dimension_se", "radius_worst", "texture_worst",
-        "perimeter_worst", "area_worst", "smoothness_worst", "compactness_worst",
-        "concavity_worst", "concave_points_worst", "symmetry_worst", "fractal_dimension_worst"
-    };
+    // Convert class attribute to binary values (0 and 1)
+    Attribute classAttribute = data.classAttribute();
+    Map<String, Double> classMapping = new HashMap<>();
+    classMapping.put("M", 1.0);
+    classMapping.put("B", 0.0);
 
-    // Split the data into training and test sets
-    Dataset<Row>[] splits = data.randomSplit(new double[] { 0.7, 0.3 });
-    Dataset<Row> trainingData = splits[0];
-    Dataset<Row> testData = splits[1];
+    for (int i = 0; i < data.numInstances(); i++) {
+      double classValue = classMapping.get(data.instance(i).stringValue(classAttribute));
+      data.instance(i).setClassValue(classValue);
+    }
 
-    // Index labels, adding metadata to the label column
-    StringIndexer labelIndexer = new StringIndexer()
-        .setInputCol("diagnosis")
-        .setOutputCol("indexedLabel");
+    // Split the data into training and testing sets
+    int trainSize = (int) (data.numInstances() * 0.8);
+    int testSize = data.numInstances() - trainSize;
+    Instances trainData = new Instances(data, 0, trainSize);
+    Instances testData = new Instances(data, trainSize, testSize);
 
-    // Vector Assembler
-    VectorAssembler assembler = new VectorAssembler()
-        .setInputCols(featureColumns)
-        .setOutputCol("features");
+    // Build and train the Random Forest model
+    RandomForest forest = new RandomForest();
+    forest.setNumIterations(100); // n_estimators in Python
+    forest.setSeed(42); // random_state in Python
+    forest.buildClassifier(trainData);
 
-    // Train a RandomForest model
-    RandomForestClassifier rf = new RandomForestClassifier()
-        .setLabelCol("indexedLabel")
-        .setFeaturesCol("features")
-        .setNumTrees(100);
+    // Evaluate the model on the testing data
+    Evaluation evaluation = new Evaluation(trainData);
+    evaluation.evaluateModel(forest, testData);
 
-    // Convert indexed labels back to original labels
-    IndexToString labelConverter = new IndexToString()
-        .setInputCol("prediction")
-        .setOutputCol("predictedLabel")
-        .setLabels(labelIndexer.fit(data).labels());
-
-    // Chain indexers and forest in a Pipeline
-    Pipeline pipeline = new Pipeline()
-        .setStages(new PipelineStage[] { labelIndexer, assembler, rf, labelConverter });
-
-    // Train model
-    PipelineModel model = pipeline.fit(trainingData);
-
-    // Make predictions
-    Dataset<Row> predictions = model.transform(testData);
-
-    // Evaluate model
-    MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
-        .setLabelCol("indexedLabel")
-        .setPredictionCol("prediction")
-        .setMetricName("accuracy");
-    double accuracy = evaluator.evaluate(predictions);
-
-    // Print only the accuracy
-    System.out.println("Test Accuracy = " + accuracy);
-
-    // Stop the SparkSession
-    spark.stop();
+    // Print accuracy and classification report
+    System.out.println("Accuracy: " + evaluation.pctCorrect() + "%");
   }
 }

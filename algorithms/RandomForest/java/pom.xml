@@ -18,43 +18,11 @@
 
 
   <dependencies>
-    <!-- Spark dependencies -->
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_${scala.binary.version}</artifactId>
-      <version>${spark.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_${scala.binary.version}</artifactId>
-      <version>${spark.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-mllib_${scala.binary.version}</artifactId>
-      <version>${spark.version}</version>
-    </dependency>
 
-    <!-- Hadoop dependencies -->
     <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-      <version>${hadoop.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-core</artifactId>
-      <version>${hadoop.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-hdfs</artifactId>
-      <version>${hadoop.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-auth</artifactId>
-      <version>${hadoop.version}</version>
+      <groupId>nz.ac.waikato.cms.weka</groupId>
+      <artifactId>weka-stable</artifactId>
+      <version>3.8.6</version>
     </dependency>
   </dependencies>
   <build>
