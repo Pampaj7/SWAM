@@ -1,39 +1,54 @@
-from rpy2.robjects import r, pandas2ri
-from rpy2.robjects.packages import importr
-from rpy2.robjects.vectors import StrVector
+import subprocess
 from codecarbon import EmissionsTracker
-
-# Enable the automatic conversion of pandas DataFrames to R data frames
-pandas2ri.activate()
-
-# Load the R script
-r.source("rRunner.R")
+import pandas as pd
 
 
-def run_model_with_dataset(dataset_name, algorithm_name):
-    # Call the R function with the given parameters
-    result = r.run_model_with_dataset(dataset_name, algorithm_name)
-    return result
+def run_r_script(dataset, algorithm):
+    subResult = subprocess.run(["Rscript", "rRunner.R", dataset, algorithm], capture_output=True, text=True)
+    print("R script output:")
+    return subResult
 
 
 if __name__ == "__main__":
     datasets = ["breastCancer", "wine", "iris"]
     algorithms = ["logisticRegression", "XGBoost", "decisionTree", "randomForest", "KNN", "SVC", "GMM"]
+    repetition = 10
+    new_data = []
+    new_csv_filename = 'emissions_detailed.csv'  # Choose an appropriate name for the new file
 
     for dataset in datasets:
         for algorithm in algorithms:
-            tracker = EmissionsTracker()
+            for _ in range(repetition):
+                tracker = EmissionsTracker(output_dir='.', output_file="emissions.csv")
 
-            print("Executing R script:")
-            print(f"with {dataset} , {algorithm}")
+                print("Executing R script:")
+                print(f"with {dataset} , {algorithm}")
 
-            tracker.start()
+                tracker.start()
 
-            # Run the model and capture the result
-            result = run_model_with_dataset(dataset, algorithm)
+                # Run the model and capture the result
+                result = run_r_script(dataset, algorithm)
 
-            tracker.stop()
+                tracker.stop()
 
-            # Print the result
-            print("R function output:")
-            print(result)
+                # Print the result
+                print("R function output:")
+                print(result)
+
+                new_data.append({'Algorithm': algorithm, 'Dataset': dataset, 'Language': 'R'})
+
+    emissions_df = pd.read_csv('emissions.csv')
+    new_data_df = pd.DataFrame(new_data)
+    assert len(new_data_df) == len(emissions_df), "Mismatch in row count between emissions data and new columns."
+    emissions_df = pd.concat([emissions_df, new_data_df], axis=1)
+    emissions_df.to_csv(new_csv_filename, index=False)
+
+    print(f"{new_csv_filename} has been created with new columns.")
+
+
+
+
+
+
+
+
