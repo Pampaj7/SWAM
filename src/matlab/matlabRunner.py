@@ -1,49 +1,43 @@
 import matlab.engine
 from codecarbon import EmissionsTracker
+import pandas as pd
 
+epochs = 10
 # Lista di combinazioni algoritmo-dataset
 combinations = [
-    ('Logistic Regression', 'breastcancer'),
-    ('XGBoost', 'breastcancer'),
-    ('Decision Tree', 'breastcancer'),
-    ('Random Forest', 'breastcancer'),
-    ('K-Nearest Neighbors', 'breastcancer'),
-    ('Support Vector Machine', 'breastcancer'),
-    ('Gaussian Mixture Model', 'breastcancer'),
-    ('Logistic Regression', 'winequality'),
-    ('XGBoost', 'winequality'),
-    ('Decision Tree', 'winequality'),
-    ('Random Forest', 'winequality'),
-    ('K-Nearest Neighbors', 'winequality'),
-    ('Support Vector Machine', 'winequality'),
-    ('Gaussian Mixture Model', 'winequality'),
-    ('Logistic Regression', 'iris'),
+    ('logisticRegression', 'breastCancer'),
+    ('XGBoost', 'breastCancer'),
+    ('decisionTree', 'breastCancer'),
+    ('randomForest', 'breastCancer'),
+    ('KNN', 'breastCancer'),
+    ('SVC', 'breastCancer'),
+    ('GMM', 'breastCancer'),
+    ('logisticRegression', 'iris'),
     ('XGBoost', 'iris'),
-    ('Decision Tree', 'iris'),
-    ('Random Forest', 'iris'),
-    ('K-Nearest Neighbors', 'iris'),
-    ('Support Vector Machine', 'iris'),
-    ('Gaussian Mixture Model', 'iris')
+    ('decisionTree', 'iris'),
+    ('randomForest', 'iris'),
+    ('KNN', 'iris'),
+    ('SVC', 'iris'),
+    ('GMM', 'iris'),
+    ('logisticRegression', 'wine'),
+    ('XGBoost', 'wine'),
+    ('decisionTree', 'wine'),
+    ('randomForest', 'wine'),
+    ('KNN', 'wine'),
+    ('SVC', 'wine'),
+    ('GMM', 'wine')
 ]
 
 
 # Funzione per eseguire uno script MATLAB e tracciare il consumo energetico
-def run_matlab_script(algorithm, dataset):
-    tracker = EmissionsTracker()
+def run_matlab_script(engine, algorithm, dataset):
+    tracker = EmissionsTracker(output_dir='.', output_file=file_name)
     tracker.start()
 
     try:
-        # Avvia l'engine MATLAB
-        eng = matlab.engine.start_matlab()
 
-        # Cambia la directory di lavoro di MATLAB
-        eng.cd('/Users/pampaj/PycharmProjects/SWAM/src/matlab', nargout=0)
+        engine.runAlgorithm(algorithm, dataset, nargout=0)
 
-        # Esegui la funzione MATLAB con i parametri
-        eng.runAlgorithm(algorithm, dataset, nargout=0)
-
-        # Termina l'engine MATLAB
-        eng.quit()
     except Exception as e:
         print(f"Error executing {algorithm} on {dataset}: {e}")
 
@@ -51,6 +45,60 @@ def run_matlab_script(algorithm, dataset):
     print(f"Emissions for {algorithm} on {dataset}: {emissions} kg CO2")
 
 
-# Esegui ogni combinazione e traccia il consumo energetico
+def add_columns(file_path, language):
+    df = pd.read_csv(file_path)
+
+    # Creazione delle colonne vuote
+    df["algorithm"] = ""
+    df["dataset"] = ""
+    df["language"] = ""
+
+    # Lista degli algoritmi in ordine
+    algorithms_order = [
+        "logisticRegression",
+        "XGBoost",
+        "decisionTree",
+        "randomForest",
+        "KNN",
+        "SVC",
+        "GMM"
+    ]
+
+    # Lista dei dataset in ordine
+    datasets_order = [
+        "breastCancer",
+        "iris",
+        "wine"
+    ]
+
+    num_algorithms = len(algorithms_order)
+    dataset_size = num_algorithms * epochs  # Calcolo delle righe occupate da ciascun dataset
+
+    # Assegna i valori alle righe
+    for dataset_index, dataset_name in enumerate(datasets_order):
+        start_dataset_row = dataset_index * dataset_size
+
+        for i, algorithm in enumerate(algorithms_order):
+            start_row = start_dataset_row + i * epochs
+            end_row = start_row + epochs
+
+            df.loc[start_row:end_row - 1, "Algorithm"] = algorithm
+            df.loc[start_row:end_row - 1, "Dataset"] = dataset_name
+            df.loc[start_row:end_row - 1, "Language"] = language
+
+    # Salva il file CSV con le nuove colonne
+    df.to_csv(file_path, index=False)
+
+
+file_name = 'combined_emissions.csv'
+
+eng = matlab.engine.start_matlab()
+
 for algorithm, dataset in combinations:
-    run_matlab_script(algorithm, dataset)
+    for epoch in range(10):
+        print(f"Running {algorithm} on {dataset}, epoch {epoch + 1}")
+        run_matlab_script(eng, algorithm, dataset)
+
+eng.quit()
+
+add_columns(file_name, "matlab")
