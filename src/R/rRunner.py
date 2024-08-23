@@ -21,6 +21,7 @@ def mainR():
             for _ in range(repetition):
 
                 tracker = EmissionsTracker(output_dir='R', output_file="emissions.csv")
+                # TODO: overwrite emission.csv or delete every time
 
                 print("Executing R script:")
                 print(f"with {dataset} , {algorithm}")
