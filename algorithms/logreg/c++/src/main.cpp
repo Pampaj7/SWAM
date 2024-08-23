@@ -1,9 +1,7 @@
-#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <random>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -143,8 +141,7 @@ int main() {
   try {
     // Load data
     auto [X, y] =
-        load_data_from_csv("/Users/niccolomarini/Documents/GitHub/SWAM/"
-                           "datasets/breastcancer/breastcancer.csv");
+        load_data_from_csv("../../../datasets/breastcancer/breastcancer.csv");
 
     // Print some information about the loaded data
     std::cout << "Loaded " << X.size() << " samples with " << X[0].size()
