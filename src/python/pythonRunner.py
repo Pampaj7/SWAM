@@ -17,13 +17,13 @@ epochs = 10
 
 # Definizione degli algoritmi
 algorithms = {
-    LogisticRegression(random_state=42, max_iter=10000, class_weight='balanced'): "Logistic Regression",
+    LogisticRegression(random_state=42, max_iter=10000, class_weight='balanced'): "logisticRegression",
     XGBClassifier(random_state=42, n_estimators=100, use_label_encoder=False, eval_metric='logloss'): "XGBoost",
-    DecisionTreeClassifier(random_state=42, class_weight='balanced'): "Decision Tree",
-    RandomForestClassifier(random_state=42, n_estimators=100, class_weight='balanced'): "Random Forest",
-    KNeighborsClassifier(n_neighbors=5): "K-Nearest Neighbors",
-    SVC(kernel='linear', random_state=42, class_weight='balanced'): "Support Vector Machine",
-    GaussianMixture(n_components=3, random_state=42): "Gaussian Mixture Model"
+    DecisionTreeClassifier(random_state=42, class_weight='balanced'): "decisionTree",
+    RandomForestClassifier(random_state=42, n_estimators=100, class_weight='balanced'): "randomForest",
+    KNeighborsClassifier(n_neighbors=5): "KNN",
+    SVC(kernel='linear', random_state=42, class_weight='balanced'): "SVC",
+    GaussianMixture(n_components=3, random_state=42): "GMM"
 }
 
 
@@ -69,7 +69,6 @@ def run_algorithms(X, y, dataset_name):
     return results
 
 
-
 def breastCancerAlgos():
     # Carica i dati
     csv_file_path = "../../datasets/breastcancer/breastcancer.csv"
@@ -85,7 +84,7 @@ def breastCancerAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y, dataset_name='Breast Cancer')
+    results = run_algorithms(X, y, dataset_name='breastCancer')
 
 
 def irisAlgos():
@@ -107,7 +106,7 @@ def irisAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y, dataset_name='Iris')
+    results = run_algorithms(X, y, dataset_name='iris')
 
 
 def wineQualityAlgos():
@@ -129,32 +128,33 @@ def wineQualityAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y, dataset_name='Wine Quality')
+    results = run_algorithms(X, y, dataset_name='wine')
 
 
-def add_columns(file_path):
+def add_columns(file_path, language):
     df = pd.read_csv(file_path)
 
     # Creazione delle colonne vuote
-    df["Algorithm"] = ""
-    df["Dataset"] = ""
+    df["algorithm"] = ""
+    df["dataset"] = ""
+    df["language"] = ""
 
     # Lista degli algoritmi in ordine
     algorithms_order = [
-        "Logistic Regression",
+        "logisticRegression",
         "XGBoost",
-        "Decision Tree",
-        "Random Forest",
-        "K-Nearest Neighbors",
-        "Support Vector Machine",
-        "Gaussian Mixture Model"
+        "decisionTree",
+        "randomForest",
+        "KNN",
+        "SVC",
+        "GMM"
     ]
 
     # Lista dei dataset in ordine
     datasets_order = [
-        "Breast Cancer",
-        "Iris",
-        "Wine Quality"
+        "breastCancer",
+        "iris",
+        "wine"
     ]
 
     num_algorithms = len(algorithms_order)
@@ -170,6 +170,7 @@ def add_columns(file_path):
 
             df.loc[start_row:end_row - 1, "Algorithm"] = algorithm
             df.loc[start_row:end_row - 1, "Dataset"] = dataset_name
+            df.loc[start_row:end_row - 1, "Language"] = language
 
     # Salva il file CSV con le nuove colonne
     df.to_csv(file_path, index=False)
@@ -181,4 +182,4 @@ irisAlgos()
 
 wineQualityAlgos()
 
-add_columns("combined_emissions.csv")
+add_columns("combined_emissions.csv", "python")
