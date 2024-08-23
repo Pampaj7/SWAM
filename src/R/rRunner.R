@@ -33,16 +33,13 @@ train_random_forest <- function(data, target, train_split = 0.8, ntree = 100, mt
   rfModel <- randomForest(formula, data = trainData, ntree = ntree, mtry = mtry, importance = TRUE)
 
   # Plot the Random Forest model error rates
-  plot(rfModel)
+  # plot(rfModel)
 
   # Predict on the test set
   predictions <- predict(rfModel, newdata = testData)
 
   # Compute the confusion matrix
   confMatrix <- confusionMatrix(predictions, testData[[target]])
-
-  # Print the confusion matrix
-  print(confMatrix)
 
   # Return the trained model and the confusion matrix
   return(list(model = rfModel, confusion_matrix = confMatrix))
@@ -64,7 +61,7 @@ train_decision_tree <- function(data, target, train_split = 0.8, minsplit = 20, 
   dtModel <- rpart(formula, data = trainData, method = "class", control = rpart.control(minsplit = minsplit, cp = cp))
 
   # Plot the Decision Tree
-  rpart.plot(dtModel, main = paste("Decision Tree for", target))
+  # rpart.plot(dtModel, main = paste("Decision Tree for", target))
 
   # Predict on the test set
   predictions <- predict(dtModel, newdata = testData, type = "class")
@@ -72,11 +69,9 @@ train_decision_tree <- function(data, target, train_split = 0.8, minsplit = 20, 
   # Compute the confusion matrix or calculate RMSE for numeric targets
   if (is.factor(data[[target]])) {
     confMatrix <- confusionMatrix(predictions, testData[[target]])
-    print(confMatrix)
   } else {
     # For regression models, calculate RMSE
     rmse <- sqrt(mean((predict(dtModel, newdata = testData) - testData[[target]])^2))
-    print(paste("RMSE:", rmse))
   }
 
   # Return the trained model and the performance metrics
@@ -107,11 +102,9 @@ train_knn <- function(data, target, train_split = 0.8, k = 5, seed = 42) {
   # Compute the confusion matrix or calculate RMSE for numeric targets
   if (is.factor(data[[target]])) {
     confMatrix <- confusionMatrix(predictions, testY)
-    print(confMatrix)
   } else {
     # For regression models, calculate RMSE
     rmse <- sqrt(mean((as.numeric(predictions) - as.numeric(testY))^2))
-    print(paste("RMSE:", rmse))
   }
 
   # Return the performance metrics
@@ -329,7 +322,7 @@ run_model_with_dataset <- function(datasetName, algorithmName){
   dataset <- switch (datasetName,
     "iris" = list(data = dataIris, target = "Species"),
     "breastCancer" = list(data = dataBreastCancer, target = "diagnosis"),
-    "wine" = list(data = dataWine, target = "type"),
+    "wine" = list(data = dataWine, target = "quality"),
     stop("invalid dataset name")
   )
   dataMatrix <- dataset$data
@@ -342,14 +335,15 @@ run_model_with_dataset <- function(datasetName, algorithmName){
     "logisticRegression" = train_logistic_regression(data = dataMatrix, target = targetValue),
     "XGBoost" = train_xgboost_classifier(data = dataMatrix, target = targetValue),
     "SVC" = train_svc_classifier(data = dataMatrix, target = targetValue),
-    "gaussianMixture" = train_gaussian_mixture(data = dataMatrix, target = targetValue),
+    "GMM" = train_gaussian_mixture(data = dataMatrix, target = targetValue),
     stop("invalid algorithm name")
   )
   return(result)
 }
 
-# run_model_with_dataset(datasetName, algorithmName)
+args <- commandArgs(trailingOnly = TRUE)
+dataset <- args[1]
+algorithm <- args[2]
 
-
-
+run_model_with_dataset(datasetName = dataset, algorithmName = algorithm)
 
