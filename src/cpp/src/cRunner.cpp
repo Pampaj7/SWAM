@@ -1,4 +1,3 @@
-// Your First C++ Program
 
 #include "DecisionTree.cpp"
 #include "RandomForest.cpp"
@@ -9,6 +8,15 @@
 #include "svc.cpp"
 #include <iostream>
 
+enum Algorithm {
+    LOGREG,
+    DECISION_TREE,
+    RANDOM_FOREST,
+    XGBOOST,
+    KNN,
+    SVC,
+    UNKNOWN
+};
 // Define dataset information structure
 struct DatasetInfo {
   std::string filePath;
@@ -19,14 +27,14 @@ struct DatasetInfo {
 // Define a mapping for datasets
 const std::unordered_map<std::string, DatasetInfo> datasetMap = {
     {"breast_cancer",
-     {"../../datasets/breastcancer/breastcancer.csv",
+     {"../../datasets/breastcancer/dataset_processed/breastcancer_processed.csv",
       "diagnosis",
       {{"M", 1}, {"B", 0}}}},
     {"iris",
-     {"../../datasets/iris/iris.csv",
-      "Species",
-      {{"setosa", 0}, {"versicolor", 1}, {"virginica", 2}}}},
-    {"wine_quality", {"../../datasets/winequality/wine_data.csv", "quality"}}};
+     {"../../datasets/iris/dataset_processed/iris_processed.csv",
+      "species",
+      {{"Iris-setosa", 0}, {"Iris-versicolor", 1}, {"Iris-virginica", 2}}}},
+    {"wine_quality", {"../../datasets/winequality/dataset_processed/wine_Data_processed.csv", "quality"}}};
 
 // Function to load dataset based on string identifier
 std::pair<arma::mat, arma::Row<size_t>>
@@ -37,17 +45,58 @@ loadDataset(const std::string &datasetName) {
   }
 
   const DatasetInfo &info = it->second;
-  return load_data_from_csv(info.filePath, info.targetColumn,
-                            info.targetMapping);
+  return load_data_from_csv(it->second.filePath, it->second.targetColumn);
+                            // it->second.targetMapping);
 }
-int main(int argc, char *argv[]) {
 
-  string datasetName = argv[1];
-  auto dataset = loadDataset(datasetName);
-  TrainLogreg(dataset);
-  TrainDecisionTree(dataset);
-  TrainRandomForest(dataset);
-  TrainXGBOOST(dataset);
-  TrainKnn(dataset);
-  TrainSVC(dataset);
+Algorithm getAlgorithmFromString(const std::string& algo) {
+    if (algo == "logreg") return LOGREG;
+    if (algo == "decision_tree") return DECISION_TREE;
+    if (algo == "random_forest") return RANDOM_FOREST;
+    if (algo == "xgboost") return XGBOOST;
+    if (algo == "knn") return KNN;
+    if (algo == "svc") return SVC;
+    return UNKNOWN;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 3) {
+        cerr << "Usage: " << argv[0] << " <dataset_name> <algorithm>" << endl;
+        return 1;
+    }
+
+    string datasetName = argv[1];
+    string algorithm = argv[2];
+    
+    // Load dataset
+    auto dataset = loadDataset(datasetName);
+    
+    // Determine which algorithm to run
+    Algorithm algo = getAlgorithmFromString(algorithm);
+
+    switch (algo) {
+        case LOGREG:
+            TrainLogreg(dataset);
+            break;
+        case DECISION_TREE:
+            TrainDecisionTree(dataset);
+            break;
+        case RANDOM_FOREST:
+            TrainRandomForest(dataset);
+            break;
+        case XGBOOST:
+            TrainXGBOOST(dataset);
+            break;
+        case KNN:
+            TrainKnn(dataset);
+            break;
+        case SVC:
+            TrainSVC(dataset);
+            break;
+        default:
+            cerr << "Unknown algorithm: " << algorithm << endl;
+            return 1;
+    }
+
+    return 0;
 }

@@ -43,7 +43,8 @@ int TrainRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Calculate accuracy
     double accuracy = accu(predictions == testY) / (double)testY.n_elem;
-    std::cout << "Test Accuracy: " << accuracy * 100 << "%" << std::endl;
+    std::cout << "Random Forest Test Accuracy: " << accuracy * 100 << "%"
+              << std::endl;
 
   } catch (const std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;
