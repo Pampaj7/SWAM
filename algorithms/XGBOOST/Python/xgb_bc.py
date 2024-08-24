@@ -7,7 +7,7 @@ import xgboost as xgb
 
 def XGBOOST():
     # Load the dataset
-    data = pd.read_csv('../../../datasets/breastcancer/breastcancer.csv')
+    data = pd.read_csv("../../../datasets/breastcancer/breastcancer.csv")
 
     # Data processing
     X = data.drop(columns=["diagnosis"])
