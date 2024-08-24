@@ -13,9 +13,9 @@ library(mclust)
 set.seed(42)
 
 
-dataIris <- read.csv("../../datasets/iris/iris.csv")
-dataBreastCancer <- read.csv("../../datasets/breastcancer/breastcancer.csv")
-dataWine <- read.csv("../../datasets/winequality/wine_data.csv")
+dataIris <- read.csv("../datasets/iris/iris.csv")
+dataBreastCancer <- read.csv("../datasets/breastcancer/breastcancer.csv")
+dataWine <- read.csv("../datasets/winequality/wine_data.csv")
 
 
 train_random_forest <- function(data, target, train_split = 0.8, ntree = 100, mtry = 3, seed=42) {

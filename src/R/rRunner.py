@@ -1,12 +1,7 @@
+import os
 import subprocess
 from codecarbon import EmissionsTracker
 import pandas as pd
-
-
-def run_r_script(dataset, algorithm):
-    subResult = subprocess.run(["Rscript", "rRunner.R", dataset, algorithm], capture_output=True, text=True)
-    print("R script output:")
-    return subResult
 
 
 def mainR():
@@ -16,12 +11,12 @@ def mainR():
     new_data = []
     new_csv_filename = 'emissions_detailed.csv'  # Choose an appropriate name for the new file
 
+    remove("emissions.csv")
+
     for dataset in datasets:
         for algorithm in algorithms:
             for _ in range(repetition):
-
-                tracker = EmissionsTracker(output_dir='R', output_file="emissions.csv")
-                # TODO: overwrite emission.csv or delete every time
+                tracker = EmissionsTracker(output_dir='R')
 
                 print("Executing R script:")
                 print(f"with {dataset} , {algorithm}")
@@ -34,8 +29,7 @@ def mainR():
                 tracker.stop()
 
                 # Print the result
-                print("R function output:")
-                print(result)
+                handle_subprocess_result(result)
 
                 new_data.append({'Algorithm': algorithm, 'Dataset': dataset, 'Language': 'R'})
 
@@ -46,3 +40,28 @@ def mainR():
     emissions_df.to_csv(f'R/{new_csv_filename}', index=False)
 
     print(f"{new_csv_filename} has been created with new columns.")
+
+
+def run_r_script(dataset, algorithm):
+    subResult = subprocess.run(["Rscript", "R/rRunner.R", dataset, algorithm], capture_output=True, text=True)
+    return subResult
+
+
+def remove(filename):
+    try:
+        os.remove(f"R/{filename}")
+    except FileNotFoundError:
+        print("emission.csv doesn't exist yet")
+    except Exception as e:
+        print(f'error occurred: {e}')
+
+
+def handle_subprocess_result(result: subprocess.CompletedProcess):
+    print("Standard Output:")
+    print(result.stdout)
+
+    if result.stderr:
+        print("Standard Error:")
+        print(result.stderr)
+    else:
+        print("No errors occurred.")
