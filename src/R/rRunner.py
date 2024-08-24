@@ -31,7 +31,7 @@ def mainR():
                 # Print the result
                 handle_subprocess_result(result)
 
-                new_data.append({'Algorithm': algorithm, 'Dataset': dataset, 'Language': 'R'})
+                new_data.append({'algorithm': algorithm, 'dataset': dataset, 'language': 'R'})
 
     emissions_df = pd.read_csv('R/emissions.csv')
     new_data_df = pd.DataFrame(new_data)
