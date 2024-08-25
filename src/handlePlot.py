@@ -35,7 +35,7 @@ def plot(df, x_axis, y_axis, plotType="barPlot"):
 def retrive_data(save=True):
     base_directory = os.getcwd()
     csv_files = glob.glob(os.path.join(base_directory, '**/emissions_detailed.csv'), recursive=True)
-    csv_files2 = glob.glob(os.path.join(base_directory, '**/combined_emissions.csv'), recursive=True)
+    csv_files2 = glob.glob(os.path.join(base_directory, '**/emissions_detailed.csv'), recursive=True)
 
     df_list = []
 

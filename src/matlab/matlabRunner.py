@@ -82,15 +82,15 @@ def add_columns(file_path, language):
             start_row = start_dataset_row + i * epochs
             end_row = start_row + epochs
 
-            df.loc[start_row:end_row - 1, "Algorithm"] = algorithm
-            df.loc[start_row:end_row - 1, "Dataset"] = dataset_name
-            df.loc[start_row:end_row - 1, "Language"] = language
+            df.loc[start_row:end_row - 1, "algorithm"] = algorithm
+            df.loc[start_row:end_row - 1, "dataset"] = dataset_name
+            df.loc[start_row:end_row - 1, "language"] = language
 
     # Salva il file CSV con le nuove colonne
     df.to_csv(file_path, index=False)
 
 
-file_name = 'combined_emissions.csv'
+file_name = 'emissions_detailed.csv'
 
 eng = matlab.engine.start_matlab()
 
