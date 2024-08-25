@@ -36,7 +36,7 @@ def run_algorithms(X, y, dataset_name):
     for model, name in algorithms.items():
         print(f"Esecuzione dell'algoritmo: {name} sul dataset: {dataset_name}")
 
-        file_name = "combined_emissions.csv"
+        file_name = "emissions_detailed.csv"
 
         # Itera su ciascuna epoca
         for epoch in range(epochs):
@@ -176,10 +176,10 @@ def add_columns(file_path, language):
     df.to_csv(file_path, index=False)
 
 
-#breastCancerAlgos()
+breastCancerAlgos()
 
 irisAlgos()
 
 wineQualityAlgos()
 
-add_columns("combined_emissions.csv", "python")
+add_columns("emissions_detailed.csv", "python")
