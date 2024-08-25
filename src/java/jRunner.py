@@ -17,7 +17,7 @@ def compile_java():
 
 
 def run_java_program(dataset, algorithm):
-    compile_java()
+    # compile_java()
     try:
         # Esegui il programma Java
         result = subprocess.run(
@@ -56,7 +56,7 @@ def main():
     new_csv_filename = (
         "emissions_detailed.csv"  # Choose an appropriate name for the new file
     )
-
+    compile_java()
     for dataset in datasets:
         for algorithm in algorithms:
             for _ in range(repetition):
