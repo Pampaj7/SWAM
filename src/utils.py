@@ -20,7 +20,7 @@ def retrive_data(save=False):
     merged_df = pd.concat(df_list, ignore_index=True)
 
     if save:
-        merged_csv_path = os.path.join(base_directory, 'merged_emissions.csv')
+        merged_csv_path = os.path.join(base_directory, 'raw_merged_emissions.csv')
         merged_df.to_csv(merged_csv_path, index=False)
 
     return merged_df
