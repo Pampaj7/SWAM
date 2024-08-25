@@ -1,60 +1,28 @@
-import os
-
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import glob
+from utils import *
 
 
-def plot(df, x_axis, y_axis, plotType="barPlot"):
-    plt.figure(figsize=(10, 6))
+df = pd.read_csv('merged_emissions.csv')
+meanData = mean_unique_triplets(df, "duration", "energy_consumed")  # dataset con le medie di tutte le triplette uguali
 
-    if plotType == "boxPlot":
-        sns.boxplot(x=x_axis, y=y_axis, data=df)
-    elif plotType == "barPlot":
-        sns.barplot(x=x_axis, y=y_axis, data=df, ci=None)
-    elif plotType == "violinPlot":
-        sns.violinplot(x=x_axis, y=y_axis, data=df)
-    else:
-        raise ValueError(f"Invalid plot type '{plotType}'. Valid options are 'barPlot', 'boxPlot', or 'violinPlot'.")
+# saveCsv(meanData, "meanEmissions.csv")  # salva nella cartella processedDataset
 
-    plt.title(f'{y_axis} by {x_axis}')
-    plt.ylabel(f'{y_axis}')
-    plt.xlabel(f'{x_axis}')
-    plt.xticks(rotation=45)
-    plt.show()
+print(meanData)
 
+# mean_group_by() rende un dataset con le medie calcolate raggruppando sulla prima stringa data in input
 
-def retrive_data(save=True):
-    base_directory = os.getcwd()
-    csv_files = glob.glob(os.path.join(base_directory, '**/emissions_detailed.csv'), recursive=True)
-    csv_files2 = glob.glob(os.path.join(base_directory, '**/emissions_detailed.csv'), recursive=True)
+group_by_algorithm = mean_group_by(meanData, "algorithm", "duration", "energy_consumed")
+group_by_dataset = mean_group_by(meanData, "dataset", "duration", "energy_consumed")
+group_by_language = mean_group_by(meanData, "language", "duration", "energy_consumed")
 
-    df_list = []
+print("Group by dataset")
+print(group_by_dataset)
+print("\nGroup by language")
+print(group_by_language)
+print("\nGroup by algorithm")
+print(group_by_algorithm)
 
-    for file in csv_files:
-        df = pd.read_csv(file)
-        print(df.columns)
-        df_list.append(df)
+# per plottare scegli l'asse x e l'asse y
 
-    for file in csv_files2:
-        df = pd.read_csv(file)
-        print(df.columns)
-        df_list.append(df)
-
-    merged_df = pd.concat(df_list, ignore_index=True)
-
-    if save:
-        merged_csv_path = os.path.join(base_directory, 'merged_emissions.csv')
-        merged_df.to_csv(merged_csv_path, index=False)
-
-    return merged_df
-
-
-df = pd.read_csv('cpp/emissions/emissions_detailed.csv')
-x_axis = "algorithm"
-y_axis = "energy_consumed"
-
-plot(df, x_axis, y_axis, "boxPlot")
-df = retrive_data(save=True)
-print(df.columns)
+plot(group_by_language, "language", "duration")
+plot(group_by_dataset, "dataset", "energy_consumed")
+plot(group_by_algorithm, "algorithm", "duration")
