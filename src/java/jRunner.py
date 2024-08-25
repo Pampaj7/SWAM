@@ -41,14 +41,14 @@ def run_java_program(dataset, algorithm):
 
 
 def main():
-    datasets = ["breast_cancer", "winequality", "iris"]
+    datasets = ["breastCancer", "wine", "iris"]
     algorithms = [
-        "logreg",
-        "xgboost",
-        "decisiontree",
-        "randomforest",
-        "knn",
-        "svc",
+        "logisticRegression",
+        "XGBoost",
+        "decisionTree",
+        "randomForest",
+        "KNN",
+        "SVC",
         # "GMM",
     ]
     repetition = 1
@@ -76,7 +76,7 @@ def main():
                 # Print the result
 
                 new_data.append(
-                    {"Algorithm": algorithm, "Dataset": dataset, "Language": "java"}
+                    {"algorithm": algorithm, "dataset": dataset, "language": "java"}
                 )
 
     emissions_df = pd.read_csv("emissions.csv")

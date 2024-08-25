@@ -6,20 +6,20 @@ public class main {
 
   public static Instances loadDataset(String datasetName) {
     // Assuming you have a DatasetLoader class with a loadDataset method
-    Instances data = loader.loadDataset(datasetName);
-    // switch case to select the target label based on the dataset name
-    String targetLabel = null;
+    String dataset_path = "";
     switch (datasetName) {
-      case "breastcancer":
-        targetLabel = "diagnosis";
+      case "breastCancer":
+        dataset_path = "breast_cancer";
         break;
       case "iris":
-        targetLabel = "species";
+        dataset_path = "iris";
         break;
-      case "winequality":
-        targetLabel = "quality";
+      case "wine":
+        dataset_path = "winequality";
         break;
     }
+    Instances data = loader.loadDataset(dataset_path);
+    // switch case to select the target label based on the dataset name
 
     if (data != null) {
       System.out.println("Dataset loaded successfully: " + data.relationName());
@@ -42,13 +42,13 @@ public class main {
     Instances data = loadDataset(datasetName);
     String targetLabel = "";
     switch (datasetName) {
-      case "breast_cancer":
+      case "breastCancer":
         targetLabel = "diagnosis";
         break;
       case "iris":
         targetLabel = "species";
         break;
-      case "winequality":
+      case "wine":
         targetLabel = "quality";
         break;
     }
@@ -60,7 +60,7 @@ public class main {
 
     try {
       switch (algorithm.toLowerCase()) {
-        case "logreg":
+        case "logisticregression":
           logreg.train(data, targetLabel);
           break;
         case "decisiontree":
