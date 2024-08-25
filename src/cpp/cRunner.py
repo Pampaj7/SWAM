@@ -35,14 +35,14 @@ def run_cpp_program(dataset, algorithm):
 
 
 def main():
-    datasets = ["breast_cancer", "wine_quality", "iris"]
+    datasets = ["breastCancer", "wine", "iris"]
     algorithms = [
-        "logreg",
-        "xgboost",
-        "decision_tree",
-        "random_forest",
-        "knn",
-        "svc",
+        "logisticRegression",
+        "XGBoost",
+        "decisionTree",
+        "randomForest",
+        "KNN",
+        "SVC",
         # "GMM",
     ]
     repetition = 1
@@ -72,7 +72,7 @@ def main():
                 # Print the result
 
                 new_data.append(
-                    {"Algorithm": algorithm, "Dataset": dataset, "Language": "cpp"}
+                    {"algorithm": algorithm, "dataset": dataset, "language": "cpp"}
                 )
 
     emissions_df = pd.read_csv("emissions/emissions.csv")
