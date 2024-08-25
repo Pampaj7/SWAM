@@ -90,7 +90,7 @@ def breastCancerAlgos():
 def irisAlgos():
     # Carica i dati Iris
     csv_file_path = "../../datasets/iris/iris.csv"  # Modifica con il percorso corretto del tuo file
-    data = pd.read_csv(csv_file_path, header=None)
+    data = pd.read_csv(csv_file_path, header=0)
 
     # Definisci i nomi delle colonne
     data.columns = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species']
@@ -168,15 +168,15 @@ def add_columns(file_path, language):
             start_row = start_dataset_row + i * epochs
             end_row = start_row + epochs
 
-            df.loc[start_row:end_row - 1, "Algorithm"] = algorithm
-            df.loc[start_row:end_row - 1, "Dataset"] = dataset_name
-            df.loc[start_row:end_row - 1, "Language"] = language
+            df.loc[start_row:end_row - 1, "algorithm"] = algorithm
+            df.loc[start_row:end_row - 1, "dataset"] = dataset_name
+            df.loc[start_row:end_row - 1, "language"] = language
 
     # Salva il file CSV con le nuove colonne
     df.to_csv(file_path, index=False)
 
 
-breastCancerAlgos()
+#breastCancerAlgos()
 
 irisAlgos()
 

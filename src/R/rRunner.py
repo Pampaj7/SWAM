@@ -7,9 +7,9 @@ import pandas as pd
 def mainR():
     datasets = ["breastCancer", "wine", "iris"]
     algorithms = ["logisticRegression", "XGBoost", "decisionTree", "randomForest", "KNN", "SVC", "GMM"]
-    repetition = 1
+    repetition = 5
     new_data = []
-    new_csv_filename = 'emissions_detailed.csv'  # Choose an appropriate name for the new file
+    new_csv_filename = 'emissions_detailed.csv'
 
     remove("emissions.csv")
 
