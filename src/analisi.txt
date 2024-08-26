@@ -1,0 +1,19 @@
+1
+    istogrammi classici, durata, emissioni, energia consumata
+    matrice di correlazione heatmap correlazioni variab num?
+    pairplot per correlazioni binarie
+
+2
+    confronto algo
+    confronto ling prog
+    confronto dataset
+
+3
+    potremmo fare una reglog per vedere se tipo i dati lin , quad e scatterplot con linreg
+    analisi combinata facetgrid e interaction plot
+
+4
+    outliers e clusterizzazione
+
+
+# ocho python che si fa il tracker su meno roba!!!
