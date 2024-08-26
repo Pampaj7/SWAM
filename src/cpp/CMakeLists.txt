@@ -12,6 +12,7 @@ set(DIVISIBLE_INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
 find_package(PkgConfig REQUIRED)
 find_package(Armadillo REQUIRED)
+find_package(OpenCV REQUIRED)
 
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)

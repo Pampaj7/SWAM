@@ -61,7 +61,9 @@ def main():
         for algorithm in algorithms:
             for _ in range(repetition):
 
-                tracker = EmissionsTracker(output_dir="./", output_file="emissions.csv")
+                tracker = EmissionsTracker(
+                    output_dir="java", output_file="emissions.csv"
+                )
                 # TODO: overwrite emission.csv or delete every time
                 tracker.start()
 
