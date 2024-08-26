@@ -26,3 +26,16 @@ print(group_by_algorithm)
 plot(group_by_language, "language", "duration")
 plot(group_by_dataset, "dataset", "energy_consumed")
 plot(group_by_algorithm, "algorithm", "duration")
+
+
+
+# mediana
+
+medianData = median_unique_triplets(df, "duration", "energy_consumed")
+group_by_algorithm = mean_group_by(medianData, "algorithm", "duration", "energy_consumed")
+group_by_dataset = mean_group_by(medianData, "dataset", "duration", "energy_consumed")
+group_by_language = mean_group_by(medianData, "language", "duration", "energy_consumed")
+
+plot(group_by_language, "language", "duration")
+plot(group_by_dataset, "dataset", "energy_consumed")
+plot(group_by_algorithm, "algorithm", "duration")

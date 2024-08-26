@@ -1,7 +1,5 @@
 import os
 import glob
-
-import pandas
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -56,11 +54,20 @@ def mean_unique_triplets(df: pd.DataFrame, *args: str):
     return result
 
 
-def saveCsv(df: pandas.DataFrame, name):
+def median_unique_triplets(df: pd.DataFrame, *args: str):
+
+    missing_columns = [col for col in args if col not in df.columns]
+    if missing_columns:
+        raise ValueError(f"Columns not found in DataFrame: {', '.join(missing_columns)}")
+
+    result = df.groupby(['algorithm', 'dataset', 'language'])[list(args)].median().reset_index()
+
+    return result
+
+
+def saveCsv(df: pd.DataFrame, name):
     df.to_csv(f"processedDatasets/{name}")
 
-
-import pandas as pd
 
 
 def mean_group_by(df: pd.DataFrame, group_by: str, *args):
@@ -76,5 +83,22 @@ def mean_group_by(df: pd.DataFrame, group_by: str, *args):
 
     # Group by the specified column and calculate the mean of specified features
     result_df = df.groupby(group_by)[list(args)].mean().reset_index()
+
+    return result_df
+
+
+def median_group_by(df: pd.DataFrame, group_by: str, *args):
+
+    # Check if group_by is valid
+    if group_by not in ['algorithm', 'dataset', 'language']:
+        raise ValueError("group_by must be one of 'algorithm', 'dataset', or 'language'")
+
+    # Check if args are valid feature names
+    for feature in args:
+        if feature not in df.columns:
+            raise ValueError(f"'{feature}' is not a valid column name in the DataFrame")
+
+    # Group by the specified column and calculate the mean of specified features
+    result_df = df.groupby(group_by)[list(args)].median().reset_index()
 
     return result_df
