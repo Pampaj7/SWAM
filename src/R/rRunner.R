@@ -39,10 +39,10 @@ train_random_forest <- function(data, target, train_split = 0.8, ntree = 100, mt
   predictions <- predict(rfModel, newdata = testData)
 
   # Compute the confusion matrix
-  confMatrix <- confusionMatrix(predictions, testData[[target]])
+  # confMatrix <- confusionMatrix(predictions, testData[[target]])
 
   # Return the trained model and the confusion matrix
-  return(list(model = rfModel, confusion_matrix = confMatrix))
+  # return(list(model = rfModel, confusion_matrix = confMatrix))
 }
 train_decision_tree <- function(data, target, train_split = 0.8, minsplit = 20, cp = 0.01, seed = 42) {
   # Convert the target column to a factor if it's not numeric
@@ -67,15 +67,15 @@ train_decision_tree <- function(data, target, train_split = 0.8, minsplit = 20, 
   predictions <- predict(dtModel, newdata = testData, type = "class")
 
   # Compute the confusion matrix or calculate RMSE for numeric targets
-  if (is.factor(data[[target]])) {
-    confMatrix <- confusionMatrix(predictions, testData[[target]])
-  } else {
-    # For regression models, calculate RMSE
-    rmse <- sqrt(mean((predict(dtModel, newdata = testData) - testData[[target]])^2))
-  }
+  # if (is.factor(data[[target]])) {
+  #   confMatrix <- confusionMatrix(predictions, testData[[target]])
+  # } else {
+  #   # For regression models, calculate RMSE
+  #   rmse <- sqrt(mean((predict(dtModel, newdata = testData) - testData[[target]])^2))
+  # }
 
   # Return the trained model and the performance metrics
-  return(list(model = dtModel, performance = if (is.factor(data[[target]])) confMatrix else rmse))
+  # return(list(model = dtModel, performance = if (is.factor(data[[target]])) confMatrix else rmse))
 }
 train_knn <- function(data, target, train_split = 0.8, k = 5, seed = 42) {
   # Convert the target column to a factor if it's not numeric
@@ -100,15 +100,14 @@ train_knn <- function(data, target, train_split = 0.8, k = 5, seed = 42) {
   predictions <- knn(train = trainX, test = testX, cl = trainY, k = k)
 
   # Compute the confusion matrix or calculate RMSE for numeric targets
-  if (is.factor(data[[target]])) {
-    confMatrix <- confusionMatrix(predictions, testY)
-  } else {
-    # For regression models, calculate RMSE
-    rmse <- sqrt(mean((as.numeric(predictions) - as.numeric(testY))^2))
-  }
+  # if (is.factor(data[[target]])) {
+  #   confMatrix <- confusionMatrix(predictions, testY)
+  # } else {
+  #   rmse <- sqrt(mean((as.numeric(predictions) - as.numeric(testY))^2))
+  # }
 
   # Return the performance metrics
-  return(if (is.factor(data[[target]])) confMatrix else rmse)
+  # return(if (is.factor(data[[target]])) confMatrix else rmse)
 }
 train_logistic_regression <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
@@ -155,13 +154,13 @@ train_logistic_regression <- function(data, target, train_split = 0.8, seed = 42
   }
 
   # Create confusion matrix
-  confusion_matrix <- table(Predicted = predicted_class, Actual = y_test)
+  # confusion_matrix <- table(Predicted = predicted_class, Actual = y_test)
 
   # Return model and confusion matrix
-  return(list(
-    model = model,
-    confusion_matrix = confusion_matrix
-  ))
+  # return(list(
+  #   model = model,
+  #   confusion_matrix = confusion_matrix
+  # ))
 }
 train_xgboost_classifier <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
@@ -217,13 +216,13 @@ train_xgboost_classifier <- function(data, target, train_split = 0.8, seed = 42)
   }
 
   # Create confusion matrix
-  confusion_matrix <- table(Predicted = predicted_class, Actual = y_test)
+  # confusion_matrix <- table(Predicted = predicted_class, Actual = y_test)
 
   # Return model and confusion matrix
-  return(list(
-    model = model,
-    confusion_matrix = confusion_matrix
-  ))
+  # return(list(
+  #   model = model,
+  #   confusion_matrix = confusion_matrix
+  # ))
 }
 train_svc_classifier <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
@@ -269,13 +268,13 @@ train_svc_classifier <- function(data, target, train_split = 0.8, seed = 42) {
   }
 
   # Create confusion matrix
-  confusion_matrix <- table(Predicted = predictions, Actual = y_test)
+  # confusion_matrix <- table(Predicted = predictions, Actual = y_test)
 
   # Return model and confusion matrix
-  return(list(
-    model = model,
-    confusion_matrix = confusion_matrix
-  ))
+  # return(list(
+  #   model = model,
+  #   confusion_matrix = confusion_matrix
+  # ))
 }
 train_gaussian_mixture <- function(data, target, train_split = 0.8, seed = 42) {
   # Ensure the target column is a factor
@@ -309,13 +308,13 @@ train_gaussian_mixture <- function(data, target, train_split = 0.8, seed = 42) {
   predicted_class <- factor(predictions, levels = 1:num_levels, labels = levels(y_test))
 
   # Create confusion matrix
-  confusion_matrix <- table(Predicted = predicted_class, Actual = y_test)
+  # confusion_matrix <- table(Predicted = predicted_class, Actual = y_test)
 
   # Return model and confusion matrix
-  return(list(
-    model = model,
-    confusion_matrix = confusion_matrix
-  ))
+  # return(list(
+  #   model = model,
+  #   confusion_matrix = confusion_matrix
+  # ))
 }
 
 run_model_with_dataset <- function(datasetName, algorithmName){
