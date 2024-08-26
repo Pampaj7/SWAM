@@ -2,36 +2,36 @@ import matlab.engine
 from codecarbon import EmissionsTracker
 import pandas as pd
 
-epochs = 10
+epochs = 1
 # Lista di combinazioni algoritmo-dataset
 combinations = [
-    ('logisticRegression', 'breastCancer'),
-    ('XGBoost', 'breastCancer'),
-    ('decisionTree', 'breastCancer'),
-    ('randomForest', 'breastCancer'),
-    ('KNN', 'breastCancer'),
-    ('SVC', 'breastCancer'),
-    ('GMM', 'breastCancer'),
-    ('logisticRegression', 'iris'),
-    ('XGBoost', 'iris'),
-    ('decisionTree', 'iris'),
-    ('randomForest', 'iris'),
-    ('KNN', 'iris'),
-    ('SVC', 'iris'),
-    ('GMM', 'iris'),
-    ('logisticRegression', 'wine'),
-    ('XGBoost', 'wine'),
-    ('decisionTree', 'wine'),
-    ('randomForest', 'wine'),
-    ('KNN', 'wine'),
-    ('SVC', 'wine'),
-    ('GMM', 'wine')
+    ("logisticRegression", "breastCancer"),
+    ("XGBoost", "breastCancer"),
+    ("decisionTree", "breastCancer"),
+    ("randomForest", "breastCancer"),
+    ("KNN", "breastCancer"),
+    ("SVC", "breastCancer"),
+    ("GMM", "breastCancer"),
+    ("logisticRegression", "iris"),
+    ("XGBoost", "iris"),
+    ("decisionTree", "iris"),
+    ("randomForest", "iris"),
+    ("KNN", "iris"),
+    ("SVC", "iris"),
+    ("GMM", "iris"),
+    ("logisticRegression", "wine"),
+    ("XGBoost", "wine"),
+    ("decisionTree", "wine"),
+    ("randomForest", "wine"),
+    ("KNN", "wine"),
+    ("SVC", "wine"),
+    ("GMM", "wine"),
 ]
 
 
 # Funzione per eseguire uno script MATLAB e tracciare il consumo energetico
 def run_matlab_script(engine, algorithm, dataset):
-    tracker = EmissionsTracker(output_dir='.', output_file=file_name)
+    tracker = EmissionsTracker(output_dir="matlab", output_file=file_name)
     tracker.start()
 
     try:
@@ -61,18 +61,16 @@ def add_columns(file_path, language):
         "randomForest",
         "KNN",
         "SVC",
-        "GMM"
+        "GMM",
     ]
 
     # Lista dei dataset in ordine
-    datasets_order = [
-        "breastCancer",
-        "iris",
-        "wine"
-    ]
+    datasets_order = ["breastCancer", "iris", "wine"]
 
     num_algorithms = len(algorithms_order)
-    dataset_size = num_algorithms * epochs  # Calcolo delle righe occupate da ciascun dataset
+    dataset_size = (
+        num_algorithms * epochs
+    )  # Calcolo delle righe occupate da ciascun dataset
 
     # Assegna i valori alle righe
     for dataset_index, dataset_name in enumerate(datasets_order):
@@ -82,15 +80,15 @@ def add_columns(file_path, language):
             start_row = start_dataset_row + i * epochs
             end_row = start_row + epochs
 
-            df.loc[start_row:end_row - 1, "algorithm"] = algorithm
-            df.loc[start_row:end_row - 1, "dataset"] = dataset_name
-            df.loc[start_row:end_row - 1, "language"] = language
+            df.loc[start_row : end_row - 1, "algorithm"] = algorithm
+            df.loc[start_row : end_row - 1, "dataset"] = dataset_name
+            df.loc[start_row : end_row - 1, "language"] = language
 
     # Salva il file CSV con le nuove colonne
     df.to_csv(file_path, index=False)
 
 
-file_name = 'emissions_detailed.csv'
+file_name = "emissions_detailed.csv"
 
 eng = matlab.engine.start_matlab()
 

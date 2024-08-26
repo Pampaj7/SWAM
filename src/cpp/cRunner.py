@@ -20,7 +20,7 @@ def run_cpp_program(dataset, algorithm):
     try:
         # Esegui l'eseguibile compilato
         result = subprocess.run(
-            ["./src/cRunner", dataset, algorithm],
+            ["./cpp/src/cRunner", dataset, algorithm],
             capture_output=True,
             text=True,
             check=True,
@@ -56,7 +56,7 @@ def main():
             for _ in range(repetition):
 
                 tracker = EmissionsTracker(
-                    output_dir="emissions", output_file="emissions.csv"
+                    output_dir="cpp", output_file="emissions.csv"
                 )
                 # TODO: overwrite emission.csv or delete every time
                 tracker.start()
