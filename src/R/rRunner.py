@@ -7,7 +7,7 @@ import pandas as pd
 def mainR():
     datasets = ["breastCancer", "wine", "iris"]
     algorithms = ["logisticRegression", "XGBoost", "decisionTree", "randomForest", "KNN", "SVC", "GMM"]
-    repetition = 5
+    repetition = 2
     new_data = []
     new_csv_filename = 'emissions_detailed.csv'
 

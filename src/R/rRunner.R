@@ -103,7 +103,6 @@ train_knn <- function(data, target, train_split = 0.8, k = 5, seed = 42) {
   if (is.factor(data[[target]])) {
     confMatrix <- confusionMatrix(predictions, testY)
   } else {
-    # For regression models, calculate RMSE
     rmse <- sqrt(mean((as.numeric(predictions) - as.numeric(testY))^2))
   }
 

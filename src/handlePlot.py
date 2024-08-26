@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import mean_unique_triplets, mean_group_by, saveCsv, plot
+from utils import mean_unique_triplets, mean_group_by, saveCsv, plot, median_unique_triplets
 
 df = pd.read_csv('processedDatasets/meanEmissions.csv')
 
@@ -62,3 +62,13 @@ plot(group_by_dataset, x_axis='dataset', y_axis='energy_consumed', plotType="bar
      save_path=graphics_paths["dataset_energy_consumed"])
 plot(group_by_algorithm, x_axis='algorithm', y_axis='duration', plotType="barPlot",
      save_path=graphics_paths["algorithm_duration"])
+
+medianData = median_unique_triplets(df, "duration", "energy_consumed")
+
+group_by_algorithm = mean_group_by(medianData, "algorithm", "duration", "energy_consumed")
+group_by_dataset = mean_group_by(medianData, "dataset", "duration", "energy_consumed")
+group_by_language = mean_group_by(medianData, "language", "duration", "energy_consumed")
+
+plot(group_by_language, "language", "duration")
+plot(group_by_dataset, "dataset", "energy_consumed")
+plot(group_by_algorithm, "algorithm", "duration")
