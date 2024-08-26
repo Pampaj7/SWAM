@@ -10,10 +10,20 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 from codecarbon import EmissionsTracker
-import matplotlib.pyplot as plt
-import seaborn as sns
+import os
 
 epochs = 1
+
+# Percorso del file
+file_path = 'python/emissions_detailed.csv'
+
+# Verifica se il file esiste
+if os.path.exists(file_path):
+    # Cancella il file
+    os.remove(file_path)
+    print(f"{file_path} è stato cancellato.")
+else:
+    print(f"{file_path} non esiste.")
 
 # Definizione degli algoritmi
 algorithms = {
@@ -96,7 +106,7 @@ def breastCancerAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y, dataset_name="breastCancer")
+    run_algorithms(X, y, dataset_name="breastCancer")
 
 
 def irisAlgos():
@@ -126,7 +136,7 @@ def irisAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y, dataset_name="iris")
+    run_algorithms(X, y, dataset_name="iris")
 
 
 def wineQualityAlgos():
@@ -160,7 +170,7 @@ def wineQualityAlgos():
     X = scaler.fit_transform(X)
 
     # Esegui gli algoritmi e ottieni i risultati
-    results = run_algorithms(X, y, dataset_name="wine")
+    run_algorithms(X, y, dataset_name="wine")
 
 
 def add_columns(file_path, language):
@@ -187,7 +197,7 @@ def add_columns(file_path, language):
 
     num_algorithms = len(algorithms_order)
     dataset_size = (
-        num_algorithms * epochs
+            num_algorithms * epochs
     )  # Calcolo delle righe occupate da ciascun dataset
 
     # Assegna i valori alle righe
@@ -198,9 +208,9 @@ def add_columns(file_path, language):
             start_row = start_dataset_row + i * epochs
             end_row = start_row + epochs
 
-            df.loc[start_row : end_row - 1, "algorithm"] = algorithm
-            df.loc[start_row : end_row - 1, "dataset"] = dataset_name
-            df.loc[start_row : end_row - 1, "language"] = language
+            df.loc[start_row: end_row - 1, "algorithm"] = algorithm
+            df.loc[start_row: end_row - 1, "dataset"] = dataset_name
+            df.loc[start_row: end_row - 1, "language"] = language
 
     # Salva il file CSV con le nuove colonne
     df.to_csv(file_path, index=False)
@@ -212,4 +222,4 @@ irisAlgos()
 
 wineQualityAlgos()
 
-add_columns("emissions_detailed.csv", "python")
+#add_columns("python/emissions_detailed.csv", "python")

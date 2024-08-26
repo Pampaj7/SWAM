@@ -1,6 +1,18 @@
 import matlab.engine
 from codecarbon import EmissionsTracker
 import pandas as pd
+import os
+
+# Percorso del file
+file_path = 'matlab/emissions_detailed.csv'
+
+# Verifica se il file esiste
+if os.path.exists(file_path):
+    # Cancella il file
+    os.remove(file_path)
+    print(f"{file_path} è stato cancellato.")
+else:
+    print(f"{file_path} non esiste.")
 
 epochs = 1
 # Lista di combinazioni algoritmo-dataset
@@ -28,6 +40,7 @@ combinations = [
     ("GMM", "wine"),
 ]
 
+file_name = "emissions_detailed.csv"
 
 # Funzione per eseguire uno script MATLAB e tracciare il consumo energetico
 def run_matlab_script(engine, algorithm, dataset):
@@ -88,15 +101,14 @@ def add_columns(file_path, language):
     df.to_csv(file_path, index=False)
 
 
-file_name = "emissions_detailed.csv"
 
 eng = matlab.engine.start_matlab()
 
 for algorithm, dataset in combinations:
-    for epoch in range(10):
+    for epoch in range(epochs):
         print(f"Running {algorithm} on {dataset}, epoch {epoch + 1}")
         run_matlab_script(eng, algorithm, dataset)
 
 eng.quit()
 
-add_columns(file_name, "matlab")
+add_columns("matlab/emissions_detailed.csv", "matlab")
