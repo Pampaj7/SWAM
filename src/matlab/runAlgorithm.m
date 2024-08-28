@@ -2,12 +2,12 @@ function runAlgorithm(algorithm, dataset)
     % Carica i dati
     switch dataset
         case 'breastCancer'
-            data = readtable('../../datasets/breastcancer/breastcancer.csv');
+            data = readtable('../datasets/breastcancer/breastcancer.csv');
             data.diagnosis = double(categorical(data.diagnosis)) - 1; % 1 per 'M', 0 per 'B'
             X = data{:, setdiff(data.Properties.VariableNames, {'diagnosis', 'id'})};
             y = data.diagnosis;
         case 'wine'
-            data = readtable('../../datasets/winequality/wine_data.csv', 'ReadVariableNames', false);
+            data = readtable('../datasets/winequality/wine_data.csv', 'ReadVariableNames', false);
 
             % Definisci i nomi delle colonne
             data.Properties.VariableNames = {'fixed_acidity', 'volatile_acidity', 'citric_acid', 'residual_sugar', ...
@@ -17,7 +17,7 @@ function runAlgorithm(algorithm, dataset)
             X = data{:, 1:end-1};
             y = data.quality;
         case 'iris'
-            data = readtable('../../datasets/iris/iris.csv', 'ReadVariableNames', false);
+            data = readtable('../datasets/iris/iris.csv', 'ReadVariableNames', false);
 
             % Definisci i nomi delle colonne
             data.Properties.VariableNames = {'sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species'};
