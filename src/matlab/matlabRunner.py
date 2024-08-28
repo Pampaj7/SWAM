@@ -42,6 +42,7 @@ combinations = [
 
 file_name = "emissions_detailed.csv"
 
+
 # Funzione per eseguire uno script MATLAB e tracciare il consumo energetico
 def run_matlab_script(engine, algorithm, dataset):
     tracker = EmissionsTracker(output_dir="matlab", output_file=file_name)
@@ -82,7 +83,7 @@ def add_columns(file_path, language):
 
     num_algorithms = len(algorithms_order)
     dataset_size = (
-        num_algorithms * epochs
+            num_algorithms * epochs
     )  # Calcolo delle righe occupate da ciascun dataset
 
     # Assegna i valori alle righe
@@ -93,13 +94,12 @@ def add_columns(file_path, language):
             start_row = start_dataset_row + i * epochs
             end_row = start_row + epochs
 
-            df.loc[start_row : end_row - 1, "algorithm"] = algorithm
-            df.loc[start_row : end_row - 1, "dataset"] = dataset_name
-            df.loc[start_row : end_row - 1, "language"] = language
+            df.loc[start_row: end_row - 1, "algorithm"] = algorithm
+            df.loc[start_row: end_row - 1, "dataset"] = dataset_name
+            df.loc[start_row: end_row - 1, "language"] = language
 
     # Salva il file CSV con le nuove colonne
     df.to_csv(file_path, index=False)
-
 
 
 eng = matlab.engine.start_matlab()

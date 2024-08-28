@@ -15,15 +15,15 @@ import os
 epochs = 1
 
 # Percorso del file
-file_path = 'python/emissions_detailed.csv'
+file_path = ['python/fit_emissions_detailed.csv', "python/predict_emissions_detailed.csv"]
 
-# Verifica se il file esiste
-if os.path.exists(file_path):
-    # Cancella il file
-    os.remove(file_path)
-    print(f"{file_path} è stato cancellato.")
-else:
-    print(f"{file_path} non esiste.")
+for file in file_path:
+    if os.path.exists(file):
+        # Cancella il file
+        os.remove(file)
+        print(f"{file} è stato cancellato.")
+    else:
+        print(f"{file} non esiste.")
 
 # Definizione degli algoritmi
 algorithms = {
@@ -47,45 +47,53 @@ algorithms = {
 
 
 def run_algorithms(X, y, dataset_name):
-    results = {name: {"accuracy": 0, "emissions": 0} for name in algorithms.values()}
+    results = {name: {"accuracy": 0, "fit_emissions": 0, "predict_emissions": 0} for name in algorithms.values()}
 
-    # Divisione dei dati in set di addestramento e di test
+    # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
     for model, name in algorithms.items():
-        print(f"Esecuzione dell'algoritmo: {name} sul dataset: {dataset_name}")
+        print(f"Running algorithm: {name} on dataset: {dataset_name}")
 
         file_name = "emissions_detailed.csv"
 
-        # Itera su ciascuna epoca
         for epoch in range(epochs):
             print(f"Epoch {epoch + 1}/{epochs}")
 
-            tracker = EmissionsTracker(output_dir="python", output_file=file_name)
-            tracker.start()
-
+            # need to evaluate: same file or separated?
+            fit_tracker = EmissionsTracker(output_dir="python", output_file=f"fit_{file_name}")
+            fit_tracker.start()
             model.fit(X_train, y_train)
+            fit_emissions = fit_tracker.stop()
+
+            if fit_emissions is None:
+                fit_emissions = 0
+
+            predict_tracker = EmissionsTracker(output_dir="python", output_file=f"predict_{file_name}")
+            predict_tracker.start()
             y_pred = model.predict(X_test)
+            predict_emissions = predict_tracker.stop()
 
-            emissions = tracker.stop()
-
-            if emissions is None:
-                emissions = 0
+            if predict_emissions is None:
+                predict_emissions = 0
 
             accuracy = accuracy_score(y_test, y_pred)
 
             results[name]["accuracy"] += accuracy
-            results[name]["emissions"] += emissions
+            results[name]["fit_emissions"] += fit_emissions
+            results[name]["predict_emissions"] += predict_emissions
 
-            # Aggiunge i dati al file esistente
-
+        # Average results over the epochs
         results[name]["accuracy"] /= epochs
-        results[name]["emissions"] /= epochs
+        results[name]["fit_emissions"] /= epochs
+        results[name]["predict_emissions"] /= epochs
 
         print(
-            f"{name} Average Accuracy: {results[name]['accuracy']:.4f}, Average Emissions: {results[name]['emissions']:.4f} kg CO2"
+            f"{name} Average Accuracy: {results[name]['accuracy']:.4f}, "
+            f"Average Fit Emissions: {results[name]['fit_emissions']:.4f} kg CO2, "
+            f"Average Predict Emissions: {results[name]['predict_emissions']:.4f} kg CO2"
         )
 
     return results
@@ -222,4 +230,5 @@ irisAlgos()
 
 wineQualityAlgos()
 
-#add_columns("python/emissions_detailed.csv", "python")
+add_columns("python/fit_emissions_detailed.csv", "python")
+add_columns("python/predict_emissions_detailed.csv", "python")
