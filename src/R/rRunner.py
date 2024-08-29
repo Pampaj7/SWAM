@@ -56,7 +56,7 @@ def mainR():
 
 def run_r_script(dataset, algorithm):
     subResult = subprocess.run(
-        ["Rscript", "R/rRunner.R", dataset, algorithm], capture_output=True, text=True
+        ["Rscript", "R/rRunnerTrain.R", dataset, algorithm], capture_output=True, text=True
     )
     return subResult
 
@@ -79,3 +79,6 @@ def handle_subprocess_result(result: subprocess.CompletedProcess):
         print(result.stderr)
     else:
         print("No errors occurred.")
+
+def train_model(dataset, algorithm):
+    pass
