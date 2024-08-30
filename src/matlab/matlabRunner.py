@@ -17,6 +17,17 @@ if os.path.exists(directory_path):
 else:
     print(f"La cartella {directory_path} non esiste.")
 
+# Percorso del file
+file = 'matlab/emissions_detailed.csv'
+
+# Verifica se il file esiste
+if os.path.exists(file):
+    # Cancella il file
+    os.remove(file)
+    print(f"{file} è stato cancellato.")
+else:
+    print(f"{file} non esiste.")
+
 epochs = 1
 # Lista di combinazioni algoritmo-dataset
 combinations = [

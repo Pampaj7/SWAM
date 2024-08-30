@@ -15,7 +15,8 @@ import os
 epochs = 1
 
 # Percorso del file
-file_path = ['python/fit_emissions_detailed.csv', "python/predict_emissions_detailed.csv"]
+file_path = ['python/train_emissions_detailed.csv', "python/test_emissions_detailed.csv",
+             "python/emissions_detailed.csv"]
 
 for file in file_path:
     if os.path.exists(file):
@@ -63,7 +64,7 @@ def run_algorithms(X, y, dataset_name):
             print(f"Epoch {epoch + 1}/{epochs}")
 
             # need to evaluate: same file or separated?
-            fit_tracker = EmissionsTracker(output_dir="python", output_file=f"fit_{file_name}")
+            fit_tracker = EmissionsTracker(output_dir="python", output_file=f"train_{file_name}")
             fit_tracker.start()
             model.fit(X_train, y_train)
             fit_emissions = fit_tracker.stop()
@@ -71,7 +72,7 @@ def run_algorithms(X, y, dataset_name):
             if fit_emissions is None:
                 fit_emissions = 0
 
-            predict_tracker = EmissionsTracker(output_dir="python", output_file=f"predict_{file_name}")
+            predict_tracker = EmissionsTracker(output_dir="python", output_file=f"test_{file_name}")
             predict_tracker.start()
             y_pred = model.predict(X_test)
             predict_emissions = predict_tracker.stop()
@@ -224,11 +225,39 @@ def add_columns(file_path, language):
     df.to_csv(file_path, index=False)
 
 
+def merge_and_add_source_column(file1_path, file2_path, output_file_path):
+    df1 = pd.read_csv(file1_path)
+    df2 = pd.read_csv(file2_path)
+
+    def extract_first_word(file_path):
+        base_name = os.path.basename(file_path)
+        first_word = base_name.split('_')[0]
+        return first_word
+
+    # Estrai la prima parola dai nomi dei file
+    source1 = extract_first_word(file1_path)
+    source2 = extract_first_word(file2_path)
+
+    # Aggiungi la colonna ai DataFrame
+    df1['phase'] = source1
+    df2['phase'] = source2
+
+    # Unisci i due DataFrame
+    merged_df = pd.concat([df1, df2], ignore_index=True)
+
+    # Salva il DataFrame unito in un nuovo file CSV
+    merged_df.to_csv(output_file_path, index=False)
+
+    print(f"File CSV fusi e salvati in {output_file_path}")
+
+
 breastCancerAlgos()
 
 irisAlgos()
 
 wineQualityAlgos()
 
-add_columns("python/fit_emissions_detailed.csv", "python")
-add_columns("python/predict_emissions_detailed.csv", "python")
+add_columns("python/test_emissions_detailed.csv", "python")
+add_columns("python/train_emissions_detailed.csv", "python")
+merge_and_add_source_column("python/test_emissions_detailed.csv", "python/train_emissions_detailed.csv",
+                            "python/emissions_detailed.csv")
