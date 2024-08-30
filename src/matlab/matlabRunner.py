@@ -1,18 +1,21 @@
 import matlab.engine
-from codecarbon import EmissionsTracker
 import pandas as pd
 import os
 
-# Percorso del file
-file_path = 'matlab/fit_emissions_detailed.csv'
+# Percorso della cartella contenente i file da eliminare
+directory_path = 'matlab/models'
 
-# Verifica se il file esiste
-if os.path.exists(file_path):
-    # Cancella il file
-    os.remove(file_path)
-    print(f"{file_path} è stato cancellato.")
+# Elimina tutti i file nella cartella
+if os.path.exists(directory_path):
+    for file_name in os.listdir(directory_path):
+        file_path = os.path.join(directory_path, file_name)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f"{file_path} è stato cancellato.")
+        else:
+            print(f"{file_path} non è un file e non è stato cancellato.")
 else:
-    print(f"{file_path} non esiste.")
+    print(f"La cartella {directory_path} non esiste.")
 
 epochs = 1
 # Lista di combinazioni algoritmo-dataset
@@ -41,8 +44,77 @@ combinations = [
 ]
 
 
-def run_matlab_script(engine, algorithm, dataset):
+def processCsv():
+    # Percorso della cartella contenente i file CSV
+    directory_path = 'matlab/models/'
 
+    # Verifica se la cartella esiste
+    if not os.path.exists(directory_path):
+        print(f"La cartella {directory_path} non esiste.")
+    else:
+        # Elenco di tutti i file nella cartella
+        for file_name in os.listdir(directory_path):
+            if file_name.endswith('.csv'):
+                file_path = os.path.join(directory_path, file_name)
+
+                # Estrai informazioni dal nome del file
+                base_name = os.path.splitext(file_name)[0]
+                parts = base_name.split('_')
+
+                if len(parts) == 4:
+                    algorithm = parts[0]
+                    dataset = parts[1]
+                    phase = parts[2]
+                    language = 'matlab'  # Come specificato
+
+                    # Carica il file CSV in un DataFrame
+                    df = pd.read_csv(file_path)
+
+                    # Aggiungi le nuove colonne
+                    df['algorithm'] = algorithm
+                    df['dataset'] = dataset
+                    df['language'] = language
+                    df['phase'] = phase
+
+                    # Salva il DataFrame aggiornato
+                    updated_file_path = os.path.join(directory_path, file_name)
+                    df.to_csv(updated_file_path, index=False)
+
+                    print(f"Aggiornato: {updated_file_path}")
+                else:
+                    print(f"Nome del file non valido per: {file_name}")
+
+
+def mergeCsvFiles(directory_path, merged_file_path):
+    """
+    Unisce tutti i file CSV presenti nella directory specificata e salva il risultato in un nuovo file CSV.
+
+    Parameters:
+    - directory_path: Percorso della directory contenente i file CSV da unire.
+    - merged_file_path: Percorso del file CSV finale dove verranno salvati i dati uniti.
+    """
+    # Elenco di tutti i file nella cartella
+    all_files = [os.path.join(directory_path, file_name) for file_name in os.listdir(directory_path) if
+                 file_name.endswith('.csv')]
+
+    # Lista per memorizzare i DataFrame
+    dfs = []
+
+    # Leggi e aggiungi ogni file CSV alla lista di DataFrame
+    for file in all_files:
+        df = pd.read_csv(file)
+        dfs.append(df)
+
+    # Unisci tutti i DataFrame in uno solo
+    merged_df = pd.concat(dfs, ignore_index=True)
+
+    # Salva il DataFrame unito in un nuovo file CSV
+    merged_df.to_csv(merged_file_path, index=False)
+
+    print(f"File CSV uniti e salvati in {merged_file_path}")
+
+
+def runMatlabScript(engine, algorithm, dataset):
     try:
         engine.runAlgorithm(algorithm, dataset, nargout=0)
 
@@ -50,55 +122,13 @@ def run_matlab_script(engine, algorithm, dataset):
         print(f"Error fitting {algorithm} on {dataset}: {e}")
 
 
-def add_columns(file_path, language):
-    df = pd.read_csv(file_path)
-
-    # Creazione delle colonne vuote
-    df["algorithm"] = ""
-    df["dataset"] = ""
-    df["language"] = ""
-
-    # Lista degli algoritmi in ordine
-    algorithms_order = [
-        "logisticRegression",
-        "XGBoost",
-        "decisionTree",
-        "randomForest",
-        "KNN",
-        "SVC",
-        "GMM",
-    ]
-
-    # Lista dei dataset in ordine
-    datasets_order = ["breastCancer", "iris", "wine"]
-
-    num_algorithms = len(algorithms_order)
-    dataset_size = (
-            num_algorithms * epochs
-    )  # Calcolo delle righe occupate da ciascun dataset
-
-    # Assegna i valori alle righe
-    for dataset_index, dataset_name in enumerate(datasets_order):
-        start_dataset_row = dataset_index * dataset_size
-
-        for i, algorithm in enumerate(algorithms_order):
-            start_row = start_dataset_row + i * epochs
-            end_row = start_row + epochs
-
-            df.loc[start_row: end_row - 1, "algorithm"] = algorithm
-            df.loc[start_row: end_row - 1, "dataset"] = dataset_name
-            df.loc[start_row: end_row - 1, "language"] = language
-
-    # Salva il file CSV con le nuove colonne
-    df.to_csv(file_path, index=False)
-
-
 eng = matlab.engine.start_matlab()
 
 for algorithm, dataset in combinations:
     for epoch in range(epochs):
         print(f"Running {algorithm} on {dataset}, epoch {epoch + 1}")
-        run_matlab_script(eng, algorithm, dataset)
+        runMatlabScript(eng, algorithm, dataset)
 eng.quit()
 
-# add_columns("matlab/emissions_detailed.csv", "matlab")
+processCsv()
+mergeCsvFiles("matlab/models", "matlab/emission_detailed.csv")
