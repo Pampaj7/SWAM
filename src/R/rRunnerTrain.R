@@ -138,7 +138,7 @@ fit_and_save_svc_classifier <- function(data, target, model_path, train_split = 
 }
 
 
-run_model_with_dataset <- function(datasetName, algorithmName, pathName){
+fit_and_save_model_with_dataset <- function(datasetName, algorithmName, pathName){
   dataset <- switch (datasetName,
     "iris" = list(data = dataIris, target = "Species"),
     "breastCancer" = list(data = dataBreastCancer, target = "diagnosis"),

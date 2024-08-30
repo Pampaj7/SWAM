@@ -49,7 +49,7 @@ load_split_and_predict_decision_tree <- function(data, target, model_path, train
   # Predict on the test data set
   predictions <- predict(dtModel, newdata = testData, type = "class")
 }
-load_and_predict_knn <- function(data, target, model_path, train_split = 0.8, seed = 42) {
+load_split_and_predict_knn <- function(data, target, model_path, train_split = 0.8, seed = 42) {
   # Load the trained model parameters from the file
   model_info <- readRDS(model_path)
   trainX <- model_info$trainX
@@ -139,7 +139,7 @@ load_split_and_predict_svc_classifier <- function(data, target, model_path, trai
 }
 
 
-run_model_with_dataset <- function(datasetName, algorithmName){
+load_and_predict_model_with_dataset <- function(datasetName, algorithmName, pathName){
   dataset <- switch (datasetName,
     "iris" = list(data = dataIris, target = "Species"),
     "breastCancer" = list(data = dataBreastCancer, target = "diagnosis"),
@@ -150,11 +150,11 @@ run_model_with_dataset <- function(datasetName, algorithmName){
   targetValue <- dataset$target
 
   result <- switch (algorithmName,
-    "randomForest" = train_random_forest(data = dataMatrix, target = targetValue),
-    "decisionTree" = train_decision_tree(data = dataMatrix, target = targetValue),
-    "KNN" = train_knn(data = dataMatrix, target = targetValue),
-    "logisticRegression" = train_logistic_regression(data = dataMatrix, target = targetValue),
-    "SVC" = train_svc_classifier(data = dataMatrix, target = targetValue),
+    "randomForest" = load_split_and_predict_random_forest(data = dataMatrix, target = targetValue, model_path = pathName),
+    "decisionTree" = load_split_and_predict_decision_tree(data = dataMatrix, target = targetValue, model_path = pathName),
+    "KNN" = load_split_and_predict_knn(data = dataMatrix, target = targetValue, model_path = pathName),
+    "logisticRegression" = load_split_and_predict_logistic_regression(data = dataMatrix, target = targetValue, model_path = pathName),
+    "SVC" = load_split_and_predict_svc_classifier(data = dataMatrix, target = targetValue, model_path = pathName),
     stop("invalid algorithm name")
   )
   return(result)
@@ -163,6 +163,7 @@ run_model_with_dataset <- function(datasetName, algorithmName){
 args <- commandArgs(trailingOnly = TRUE)
 dataset <- args[1]
 algorithm <- args[2]
+path <- args[3]
 
-run_model_with_dataset(datasetName = dataset, algorithmName = algorithm)
+load_and_predict_model_with_dataset(datasetName = dataset, algorithmName = algorithm, pathName = path)
 
