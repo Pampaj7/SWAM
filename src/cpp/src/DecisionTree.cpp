@@ -8,8 +8,15 @@
 using namespace mlpack;
 using namespace arma;
 
+void SetSeedDT(int seed) {
+  // Set the random seed for reproducibility
+  arma::arma_rng::set_seed(seed);
+  mlpack::RandomSeed(seed);
+}
+
 void TrainDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
   // Load dataset
+  SetSeedDT(42);
   arma::mat x = data.first;
   arma::Row<size_t> y = data.second;
 
@@ -36,6 +43,7 @@ void TrainDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
 
 void TestDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    SetSeedDT(42);
     std::cout << "Testing Decision Tree" << std::endl;
     arma::mat x = data.first;
     arma::Row<size_t> y = data.second;

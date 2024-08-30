@@ -8,15 +8,17 @@ using namespace cv;
 using namespace cv::ml;
 using namespace arma;
 
-void SetSeedSVM(unsigned long seed) {
+void SetSeedBayes(unsigned long seed) {
   arma::arma_rng::set_seed(seed); // Set seed for Armadillo
   mlpack::RandomSeed(seed);       // Set seed for mlpack
   cv::RNG rng(seed);              // Set seed for OpenCV
 }
-// Function to train the SVM model
-void TrainSVM(std::pair<arma::mat, arma::Row<size_t>> data) {
+
+// Function to train the Naive Bayes model
+void TrainNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
-    SetSeedSVM(42);
+    SetSeedBayes(42);
+
     // Load dataset
     arma::mat X = data.first;
     arma::Row<size_t> y = data.second;
@@ -37,29 +39,24 @@ void TrainSVM(std::pair<arma::mat, arma::Row<size_t>> data) {
     cv::Mat trainX_cv(trainX.n_cols, trainX.n_rows, CV_32F, trainX.memptr());
     cv::Mat trainY_cv(trainY.n_elem, 1, CV_32S, trainY.memptr());
 
-    // Create and configure the SVM model
-    Ptr<SVM> svm = SVM::create();
-    svm->setType(SVM::C_SVC);
-    svm->setKernel(SVM::RBF); // RBF kernel
-    svm->setC(1);
-    svm->setGamma(0.5);
-    svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 1000, 1e-6));
+    // Create and configure the Naive Bayes model
+    Ptr<NormalBayesClassifier> nb = NormalBayesClassifier::create();
 
-    // Train the SVM model
-    svm->train(trainX_cv, ROW_SAMPLE, trainY_cv);
+    // Train the Naive Bayes model
+    nb->train(trainX_cv, ROW_SAMPLE, trainY_cv);
 
     // Save the trained model to a file
-    svm->save("./svm_model.xml");
+    nb->save("./naivebayes_model.xml");
 
   } catch (const std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;
   }
 }
 
-// Function to test the SVM model
-void TestSVM(std::pair<arma::mat, arma::Row<size_t>> data) {
+// Function to test the Naive Bayes model
+void TestNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
-    SetSeedSVM(42);
+    SetSeedBayes(42);
     // Load dataset
     arma::mat X = data.first;
     arma::Row<size_t> y = data.second;
@@ -80,12 +77,13 @@ void TestSVM(std::pair<arma::mat, arma::Row<size_t>> data) {
     cv::Mat testX_cv(testX.n_cols, testX.n_rows, CV_32F, testX.memptr());
     cv::Mat testY_cv(testY.n_elem, 1, CV_32S, testY.memptr());
 
-    // Load the trained SVM model from a file
-    Ptr<SVM> svm = Algorithm::load<SVM>("./svm_model.xml");
+    // Load the trained Naive Bayes model from a file
+    Ptr<NormalBayesClassifier> nb =
+        Algorithm::load<NormalBayesClassifier>("./naivebayes_model.xml");
 
     // Predict on the test set
     cv::Mat predictions;
-    svm->predict(testX_cv, predictions);
+    nb->predict(testX_cv, predictions);
 
     // Ensure predictions are in the correct shape
     predictions = predictions.reshape(1, testY_cv.rows);
@@ -97,7 +95,7 @@ void TestSVM(std::pair<arma::mat, arma::Row<size_t>> data) {
     cv::Mat diff;
     cv::compare(predictions, testY_cv, diff, cv::CmpTypes::CMP_EQ);
     double accuracy = 100.0 * cv::countNonZero(diff) / testY_cv.rows;
-    std::cout << "SVM Test Accuracy: " << accuracy << "%" << std::endl;
+    std::cout << "Naive Bayes Test Accuracy: " << accuracy << "%" << std::endl;
 
   } catch (const std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;

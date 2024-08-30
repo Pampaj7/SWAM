@@ -1,14 +1,26 @@
 
+#include "Adaboost.cpp"
 #include "DecisionTree.cpp"
 #include "RandomForest.cpp"
 #include "XGBOOST.cpp"
 #include "knn.cpp"
 #include "loader.cpp"
 #include "logreg.cpp"
+#include "naiveBayes.cpp"
 #include "svc.cpp"
 #include <iostream>
 
-enum Algs { LOGREG, DECISION_TREE, RANDOM_FOREST, XGBOOST, KNN, SVC, UNKNOWN };
+enum Algs {
+  LOGREG,
+  DECISION_TREE,
+  RANDOM_FOREST,
+  XGBOOST,
+  KNN,
+  SVC,
+  ADABOOST,
+  NAIVEBAYES,
+  UNKNOWN
+};
 // Define dataset information structure
 struct DatasetInfo {
   std::string filePath;
@@ -57,6 +69,10 @@ Algs getAlgorithmFromString(const std::string &algo) {
     return KNN;
   if (algo == "SVC")
     return SVC;
+  if (algo == "AdaBoost")
+    return ADABOOST;
+  if (algo == "naiveBayes")
+    return NAIVEBAYES;
   return UNKNOWN;
 }
 
@@ -117,6 +133,20 @@ int main(int argc, char *argv[]) {
       TestSVM(dataset);
     } else
       TrainSVM(dataset);
+    break;
+  case ADABOOST:
+    if (Test) {
+      TestAdaBoost(dataset);
+    } else {
+      TrainAdaBoost(dataset);
+    }
+    break;
+  case NAIVEBAYES:
+    if (Test) {
+      TestNaiveBayes(dataset);
+    } else {
+      TrainNaiveBayes(dataset);
+    }
     break;
   default:
     cerr << "Unknown algorithm: " << algorithm << endl;

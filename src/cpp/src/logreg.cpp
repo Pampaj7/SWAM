@@ -8,10 +8,17 @@
 
 using namespace arma;
 
+void SetSeedLR(int seed) {
+  // Set the random seed for reproducibility
+  arma::arma_rng::set_seed(seed);
+  mlpack::RandomSeed(seed);
+}
+
 // Function to train the logistic regression model
 void TrainLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
   // Load dataset
   //
+  SetSeedLR(42);
   arma::mat x = data.first;
   arma::Row<size_t> y = data.second;
   // Check the dimensions of the dataset
@@ -41,6 +48,7 @@ void TrainLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
 // Function to test the logistic regression model
 void TestLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    SetSeedLR(42);
     arma::mat x = data.first;
     arma::Row<size_t> y = data.second;
 
