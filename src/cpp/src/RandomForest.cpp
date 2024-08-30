@@ -7,48 +7,64 @@
 using namespace mlpack;
 using namespace arma;
 
-// Function to load data from CSV file
+// Function to train the Random Forest model
+void TrainRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
+    try {
+        // Load dataset
+        arma::mat X = data.first;
+        arma::Row<size_t> y = data.second;
 
-int TrainRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
-  try {
-    // Load dataset
-    arma::mat X = data.first;
-    arma::Row<size_t> y = data.second;
+        // Split the data into training and testing sets
+        arma::mat trainX, testX;
+        arma::Row<size_t> trainY, testY;
+        data::Split(X, y, trainX, testX, trainY, testY, 0.2, true); // 80% training, 20% testing
 
-    // Split the data into training and testing sets
-    arma::mat trainX, testX;
-    arma::Row<size_t> trainY, testY;
+        // Parameters for RandomForest
+        const size_t numTrees = 100; // Number of trees
+        const size_t numClasses = 2; // Number of classes
+        const size_t minimumLeafSize = 1; // Minimum leaf size
+        const bool computeImportance = false; // Not computing feature importance
+        const size_t maxDepth = 0; // Unlimited depth
 
-    data::Split(X, y, trainX, testX, trainY, testY, 0.2,
-                true); // 80% training, 20% testing
+        // Set the seed for reproducibility
+        arma::arma_rng::set_seed(42);
 
-    // Parameters for RandomForest to match scikit-learn
-    const size_t numTrees = 100; // Number of trees (equivalent to n_estimators)
-    const size_t numClasses = 2; // Number of classes
-    const size_t minimumLeafSize =
-        1; // Minimum leaf size (equivalent to min_samples_leaf)
-    const bool computeImportance = false; // Not computing feature importance
-    const size_t maxDepth = 0; // Unlimited depth (equivalent to max_depth=None)
+        // Create and train the RandomForest model
+        RandomForest<> rf(trainX, trainY, numTrees, numClasses, minimumLeafSize, computeImportance, maxDepth);
 
-    // Set the seed for reproducibility (similar to random_state in
-    // scikit-learn)
-    arma::arma_rng::set_seed(42);
+        // Save the model to a file
+        data::Save("./random_forest_model.bin", "rf_model", rf);
 
-    // Create and train the RandomForest model
-    RandomForest<> rf(trainX, trainY, numTrees);
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+}
 
-    // Predict on the test set
-    arma::Row<size_t> predictions;
-    rf.Classify(testX, predictions);
+// Function to test the Random Forest model
+void TestRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
+    try {
+        // Load dataset
+        arma::mat X = data.first;
+        arma::Row<size_t> y = data.second;
 
-    // Calculate accuracy
-    double accuracy = accu(predictions == testY) / (double)testY.n_elem;
-    std::cout << "Random Forest Test Accuracy: " << accuracy * 100 << "%"
-              << std::endl;
+        // Split the data into training and testing sets
+        arma::mat trainX, testX;
+        arma::Row<size_t> trainY, testY;
+        data::Split(X, y, trainX, testX, trainY, testY, 0.2, true); // 80% training, 20% testing
 
-  } catch (const std::exception &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-  }
+        // Load the trained RandomForest model
+        RandomForest<> rf;
+        data::Load("./random_forest_model.bin", "rf_model", rf);
 
-  return 0;
+        // Predict on the test set
+        arma::Row<size_t> predictions;
+        rf.Classify(testX, predictions);
+
+        // Calculate accuracy
+        double accuracy = accu(predictions == testY) / (double)testY.n_elem;
+        std::cout << "Random Forest Test Accuracy: " << accuracy * 100 << "%" << std::endl;
+
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
 }
