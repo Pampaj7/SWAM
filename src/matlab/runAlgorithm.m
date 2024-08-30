@@ -1,5 +1,10 @@
-function runAlgorithm(algorithm, dataset)
+
+
+function runAlgo(algorithm, dataset)
     % Carica i dati
+    pyenv('Version', '/Users/pampaj/anaconda3/envs/sw/bin/python');
+    insert(py.sys.path,int32(0),'/Users/pampaj/PycharmProjects/SWAM/src/matlab/');
+
     switch dataset
         case 'breastCancer'
             data = readtable('../datasets/breastcancer/breastcancer.csv');
@@ -39,6 +44,8 @@ function runAlgorithm(algorithm, dataset)
     y_train = y(training(cv));
     y_test = y(test(cv));
 
+    py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_emissions.csv', algorithm, dataset));
+
     % Seleziona l'algoritmo e addestra il modello
     switch algorithm
         case 'logisticRegression'
@@ -66,8 +73,11 @@ function runAlgorithm(algorithm, dataset)
             y_pred = cluster(model, X_test);
         otherwise
             error('Algorithm unknown');
+            py.tracker_control.stop_tracker();
+
     end
 
+    py.tracker_control.stop_tracker();
     % Calcola l'accuratezza
     accuracy = sum(y_pred == y_test) / length(y_test);
     fprintf('Accuracy for %s on %s: %.2f%%\n', algorithm, dataset, accuracy * 100);

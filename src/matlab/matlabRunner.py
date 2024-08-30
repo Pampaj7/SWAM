@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Percorso del file
-file_path = 'matlab/emissions_detailed.csv'
+file_path = 'matlab/fit_emissions_detailed.csv'
 
 # Verifica se il file esiste
 if os.path.exists(file_path):
@@ -40,23 +40,14 @@ combinations = [
     ("GMM", "wine"),
 ]
 
-file_name = "emissions_detailed.csv"
 
-
-# Funzione per eseguire uno script MATLAB e tracciare il consumo energetico
 def run_matlab_script(engine, algorithm, dataset):
-    tracker = EmissionsTracker(output_dir="matlab", output_file=file_name)
-    tracker.start()
 
     try:
-
         engine.runAlgorithm(algorithm, dataset, nargout=0)
 
     except Exception as e:
-        print(f"Error executing {algorithm} on {dataset}: {e}")
-
-    emissions = tracker.stop()
-    print(f"Emissions for {algorithm} on {dataset}: {emissions} kg CO2")
+        print(f"Error fitting {algorithm} on {dataset}: {e}")
 
 
 def add_columns(file_path, language):
@@ -108,7 +99,6 @@ for algorithm, dataset in combinations:
     for epoch in range(epochs):
         print(f"Running {algorithm} on {dataset}, epoch {epoch + 1}")
         run_matlab_script(eng, algorithm, dataset)
-
 eng.quit()
 
-add_columns("matlab/emissions_detailed.csv", "matlab")
+# add_columns("matlab/emissions_detailed.csv", "matlab")

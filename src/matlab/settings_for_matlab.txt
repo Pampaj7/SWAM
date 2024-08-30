@@ -1,0 +1,12 @@
+im matlab per aggiungere file da linkare
+>> pyenv('Version', '/Users/pampaj/anaconda3/envs/sw/bin/python');
+
+questo deve restituire la versione
+╰─ /Users/pampaj/anaconda3/envs/sw/bin/python --version                                                                        ─╯
+
+aggiungi il path a matlah
+>> insert(py.sys.path,int32(0),'/Users/pampaj/PycharmProjects/SWAM/src/matlab/');
+
+se funziona questo
+mod = py.importlib.import_module('tracker_control');
+allora significa che è linkato
