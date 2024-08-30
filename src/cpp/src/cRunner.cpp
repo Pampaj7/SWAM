@@ -8,15 +8,7 @@
 #include "svc.cpp"
 #include <iostream>
 
-enum Algorithm {
-  LOGREG,
-  DECISION_TREE,
-  RANDOM_FOREST,
-  XGBOOST,
-  KNN,
-  SVC,
-  UNKNOWN
-};
+enum Algs { LOGREG, DECISION_TREE, RANDOM_FOREST, XGBOOST, KNN, SVC, UNKNOWN };
 // Define dataset information structure
 struct DatasetInfo {
   std::string filePath;
@@ -52,7 +44,7 @@ loadDataset(const std::string &datasetName) {
   // it->second.targetMapping);
 }
 
-Algorithm getAlgorithmFromString(const std::string &algo) {
+Algs getAlgorithmFromString(const std::string &algo) {
   if (algo == "logisticRegression")
     return LOGREG;
   if (algo == "decisionTree")
@@ -70,42 +62,65 @@ Algorithm getAlgorithmFromString(const std::string &algo) {
 
 int main(int argc, char *argv[]) {
   if (argc < 3) {
-    cerr << "Usage: " << argv[0] << " <dataset_name> <algorithm>" << endl;
+    cerr << "Usage: " << argv[0] << " <dataset_name> <algorithm> <train-test>"
+         << endl;
     return 1;
   }
 
   string datasetName = argv[1];
   string algorithm = argv[2];
+  string train = argv[3];
+  bool Test;
+  if (!strcmp(argv[3], "true")) {
+    Test = true;
+  } else {
+    Test = false;
+  }
 
   // Load dataset
   auto dataset = loadDataset(datasetName);
 
   // Determine which algorithm to run
-  Algorithm algo = getAlgorithmFromString(algorithm);
+  Algs algo = getAlgorithmFromString(algorithm);
 
   switch (algo) {
   case LOGREG:
-    TrainLogreg(dataset);
+    if (Test) {
+      TestLogisticRegression(dataset);
+    } else {
+      TrainLogisticRegression(dataset);
+    }
     break;
   case DECISION_TREE:
-    TrainDecisionTree(dataset);
+    if (Test) {
+      TestDecisionTree(dataset);
+    } else
+      TrainDecisionTree(dataset);
     break;
   case RANDOM_FOREST:
-    TrainRandomForest(dataset);
+    if (Test) {
+      TestRandomForest(dataset);
+    } else
+      TrainRandomForest(dataset);
     break;
   case XGBOOST:
     TrainXGBOOST(dataset);
     break;
   case KNN:
-    TrainKnn(dataset);
+    if (Test) {
+      TestKnn(dataset);
+    } else
+      TrainKnn(dataset);
     break;
   case SVC:
-    TrainSVC(dataset);
+    if (Test) {
+      TestSVM(dataset);
+    } else
+      TrainSVM(dataset);
     break;
   default:
     cerr << "Unknown algorithm: " << algorithm << endl;
     return 1;
   }
-
   return 0;
 }

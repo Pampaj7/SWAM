@@ -1,106 +1,91 @@
-// #include "loader.cpp"
-#include <algorithm>
+#include <opencv2/opencv.hpp>
+#include <opencv2/ml.hpp>
 #include <armadillo>
-#include <cmath>
 #include <iostream>
-#include <unordered_map>
-#include <vector>
+#include <mlpack/core/data/split_data.hpp>
 
-// Your load_data_from_csv function goes here
+using namespace cv;
+using namespace cv::ml;
+using namespace arma;
 
-class KNNClassifier {
-private:
-  arma::mat X_train;
-  arma::Row<size_t> y_train;
-  size_t k;
+// Function to train the KNN model
+void TrainKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
+    try {
+        // Load dataset
+        arma::mat X = data.first;
+        arma::Row<size_t> y = data.second;
 
-  struct DistanceIndex {
-    double distance;
-    size_t index;
+        // Check the dimensions of the dataset
+        if (X.n_cols != y.n_elem) {
+            throw std::runtime_error("Mismatch between feature matrix and target vector size.");
+        }
 
-    bool operator<(const DistanceIndex &other) const {
-      return distance < other.distance;
+        // Split the data into training and testing sets
+        arma::mat trainX, testX;
+        arma::Row<size_t> trainY, testY;
+        mlpack::data::Split(X, y, trainX, testX, trainY, testY, 0.2, true); // 80% training, 20% testing
+
+        // Convert Armadillo matrices to OpenCV matrices
+        cv::Mat trainX_cv(trainX.n_cols, trainX.n_rows, CV_32F, trainX.memptr());
+        cv::Mat trainY_cv(trainY.n_elem, 1, CV_32S, trainY.memptr());
+
+        // Create and configure the KNN model
+        Ptr<KNearest> knn = KNearest::create();
+        knn->setDefaultK(3); // Set the number of neighbors to 3
+        knn->setIsClassifier(true);
+
+        // Train the KNN model
+        knn->train(trainX_cv, ROW_SAMPLE, trainY_cv);
+
+        // Save the trained model to a file
+        knn->save("./knn_model.xml");
+
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
     }
-  };
+}
 
-public:
-  KNNClassifier(size_t k = 3) : k(k) {}
+// Function to test the KNN model
+void TestKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
+    try {
+        // Load dataset
+        arma::mat X = data.first;
+        arma::Row<size_t> y = data.second;
 
-  void fit(const arma::mat &X, const arma::Row<size_t> &y) {
-    X_train = X;
-    y_train = y;
-  }
+        // Check the dimensions of the dataset
+        if (X.n_cols != y.n_elem) {
+            throw std::runtime_error("Mismatch between feature matrix and target vector size.");
+        }
 
-  arma::Row<size_t> predict(const arma::mat &X_test) {
-    arma::Row<size_t> predictions(X_test.n_cols);
+        // Split the data into training and testing sets
+        arma::mat trainX, testX;
+        arma::Row<size_t> trainY, testY;
+        mlpack::data::Split(X, y, trainX, testX, trainY, testY, 0.2, true); // 80% training, 20% testing
 
-    for (size_t i = 0; i < X_test.n_cols; ++i) {
-      predictions(i) = predict_single(X_test.col(i));
+        // Convert Armadillo matrices to OpenCV matrices
+        cv::Mat testX_cv(testX.n_cols, testX.n_rows, CV_32F, testX.memptr());
+        cv::Mat testY_cv(testY.n_elem, 1, CV_32S, testY.memptr());
+
+        // Load the trained KNN model from a file
+        Ptr<KNearest> knn = Algorithm::load<KNearest>("./knn_model.xml");
+
+        // Predict on the test set
+        cv::Mat predictions;
+        knn->findNearest(testX_cv, knn->getDefaultK(), predictions);
+
+        // Ensure predictions are in the correct shape
+        predictions = predictions.reshape(1, testY_cv.rows);
+
+        // Convert predictions to the same type as testY_cv
+        predictions.convertTo(predictions, CV_32S);
+
+        // Calculate accuracy
+        cv::Mat diff;
+        cv::compare(predictions, testY_cv, diff, cv::CmpTypes::CMP_EQ);
+        double accuracy = 100.0 * cv::countNonZero(diff) / testY_cv.rows;
+        std::cout << "KNN Test Accuracy: " << accuracy << "%" << std::endl;
+
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
     }
-
-    return predictions;
-  }
-
-private:
-  size_t predict_single(const arma::vec &x) {
-    std::vector<DistanceIndex> distances;
-
-    for (size_t i = 0; i < X_train.n_cols; ++i) {
-      double dist = arma::norm(X_train.col(i) - x);
-      distances.push_back({dist, i});
-    }
-
-    std::partial_sort(distances.begin(), distances.begin() + k,
-                      distances.end());
-
-    std::unordered_map<size_t, size_t> class_counts;
-    for (size_t i = 0; i < k; ++i) {
-      size_t label = y_train(distances[i].index);
-      class_counts[label]++;
-    }
-
-    size_t max_count = 0;
-    size_t predicted_class = 0;
-    for (const auto &pair : class_counts) {
-      if (pair.second > max_count) {
-        max_count = pair.second;
-        predicted_class = pair.first;
-      }
-    }
-
-    return predicted_class;
-  }
-};
-
-int TrainKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
-
-  try {
-    arma::mat X = data.first;
-    arma::Row<size_t> y = data.second;
-    // Split the data into training and testing sets (80-20 split)
-    size_t trainSize = static_cast<size_t>(X.n_cols * 0.8);
-    arma::mat X_train = X.cols(0, trainSize - 1);
-    arma::mat X_test = X.cols(trainSize, X.n_cols - 1);
-    arma::Row<size_t> y_train = y.subvec(0, trainSize - 1);
-    arma::Row<size_t> y_test = y.subvec(trainSize, y.n_elem - 1);
-
-    // Create and train the KNN classifier
-    KNNClassifier knn_classifier(5); // Using k=5
-    knn_classifier.fit(X_train, y_train);
-
-    // Make predictions
-    arma::Row<size_t> predictions = knn_classifier.predict(X_test);
-
-    // Calculate accuracy
-    size_t correct = arma::accu(predictions == y_test);
-    double accuracy = static_cast<double>(correct) / y_test.n_elem;
-
-    std::cout << "KNN Accuracy: " << accuracy * 100 << "%" << std::endl;
-
-  } catch (const std::exception &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-    return 1;
-  }
-
-  return 0;
 }
