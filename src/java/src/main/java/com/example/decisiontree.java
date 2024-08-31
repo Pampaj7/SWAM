@@ -14,6 +14,7 @@ import weka.core.SerializationHelper;
 import java.util.Random;
 
 public class decisiontree {
+  private static PythonHandler pythonHandler = new PythonHandler();
 
   // Classifier instance that will be trained and tested
   private static final String MODEL_FILE = "decisionTree.model";
@@ -49,7 +50,9 @@ public class decisiontree {
 
       // Create and train the decision tree (J48) classifier
       classifier = new J48(); // J48 is the Weka implementation of C4.5
+      pythonHandler.startTracker("emissions.csv");
       classifier.buildClassifier(train);
+      pythonHandler.stopTracker();
       SerializationHelper.write(MODEL_FILE, classifier);
       System.out.println("Model saved to " + MODEL_FILE);
 
@@ -92,7 +95,9 @@ public class decisiontree {
 
       // Evaluate the classifier on the test set
       Evaluation evaluation = new Evaluation(split[0]); // Pass training set for evaluation context
+      pythonHandler.startTracker("emissions.csv");
       evaluation.evaluateModel(classifier, test);
+      pythonHandler.stopTracker();
 
       // Output the accuracy
       System.out.println("DT Accuracy: " + evaluation.pctCorrect() + "%");
