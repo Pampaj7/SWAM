@@ -4,6 +4,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
 import weka.core.Attribute;
 import weka.core.Instances;
+import weka.core.SerializationHelper;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -12,62 +13,42 @@ import java.util.List;
 
 public class knn {
 
-  public static Instances convertClassToNominal(Instances data, String targetLabelName) {
-    // Get the class index based on the target label name
+  private static final String MODEL_FILE = "knnModel.model";
+  private static IBk knn;
+
+  public static void train(Instances data, String targetLabelName) throws Exception {
     int targetIndex = data.attribute(targetLabelName).index();
     data.setClassIndex(targetIndex);
 
-    // Check if the class attribute is numeric and convert it to nominal if
-    // necessary
-    if (data.classAttribute().isNumeric()) {
-      List<String> uniqueValues = new ArrayList<>();
-      HashMap<Double, String> valueMap = new HashMap<>();
-      Enumeration<?> enu = data.enumerateInstances();
-
-      // Gather unique numeric values to create nominal values
-      while (enu.hasMoreElements()) {
-        double value = ((weka.core.Instance) enu.nextElement()).classValue();
-        String valueString = String.valueOf(value);
-        if (!uniqueValues.contains(valueString)) {
-          uniqueValues.add(valueString);
-          valueMap.put(value, valueString);
-        }
-      }
-
-      // Create a nominal attribute
-      ArrayList<String> nominalValues = new ArrayList<>(uniqueValues);
-      Attribute nominalClassAttribute = new Attribute(targetLabelName, nominalValues);
-
-      // Replace the numeric class attribute with the new nominal attribute
-      Instances newData = new Instances(data);
-      newData.deleteAttributeAt(targetIndex);
-      newData.insertAttributeAt(nominalClassAttribute, targetIndex);
-      newData.setClassIndex(targetIndex);
-
-      // Update the class values to nominal
-      for (int i = 0; i < newData.numInstances(); i++) {
-        double numericValue = data.instance(i).classValue();
-        newData.instance(i).setClassValue(valueMap.get(numericValue));
-      }
-      return newData;
-    }
-
-    return data;
-  }
-
-  public static Classifier train(Instances data, String targetLabelName) throws Exception {
     // Set the class index based on the target label name
-    int targetIndex = data.attribute(targetLabelName).index();
-    data.setClassIndex(targetIndex);
 
     // Create and configure the k-NN model
-    IBk knn = new IBk(); // Default k is 1
+    knn = new IBk();
     knn.setKNN(3); // Set k to 3 for example
     knn.buildClassifier(data);
-    double accuracy = evaluateModel(knn, data);
-    System.out.println("knn Accuracy: " + accuracy * 100 + "%");
 
-    return knn;
+    // Save the model to a file
+    SerializationHelper.write(MODEL_FILE, knn);
+    System.out.println("Model saved to " + MODEL_FILE);
+
+  }
+
+  public static void test(Instances data, String targetLabelName) throws Exception {
+    // Load the model from the file
+    if (knn == null) {
+      knn = (IBk) SerializationHelper.read(MODEL_FILE);
+    }
+
+    if (knn == null) {
+      System.out.println("Error: Model could not be loaded.");
+      return;
+    }
+
+    // Set the class index based on the target label name
+    data.setClassIndex(data.attribute(targetLabelName).index());
+
+    double accuracy = evaluateModel(knn, data);
+    System.out.println("k-NN Test Accuracy: " + accuracy * 100 + "%");
   }
 
   private static double evaluateModel(Classifier model, Instances data) throws Exception {
@@ -89,4 +70,5 @@ public class knn {
     }
     return (double) correct / testData.numInstances();
   }
+
 }

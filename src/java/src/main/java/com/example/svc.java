@@ -5,8 +5,14 @@ import weka.classifiers.functions.SMO;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
+import weka.core.SerializationHelper;
+
+import java.io.File;
 
 public class svc {
+
+  private static final String MODEL_FILE = "svcModel.model";
+  private static SMO smo;
 
   public static Instances convertClassToNominal(Instances data, String targetLabelName) throws Exception {
     int targetIndex = data.attribute(targetLabelName).index();
@@ -24,18 +30,38 @@ public class svc {
     return data;
   }
 
-  public static Classifier train(Instances data, String targetLabelName) throws Exception {
+  public static void train(Instances data, String targetLabelName) throws Exception {
     // Set the class index based on the target label name
     data = convertClassToNominal(data, targetLabelName);
     data.setClassIndex(data.attribute(targetLabelName).index());
 
     // Create and configure the SVC (SMO) model
-    SMO smo = new SMO();
+    smo = new SMO();
     smo.buildClassifier(data);
-    double accuracy = evaluateModel(smo, data);
-    System.out.println("SVC Accuracy: " + accuracy);
 
-    return smo;
+    // Save the model to a file
+    SerializationHelper.write(MODEL_FILE, smo);
+    System.out.println("Model saved to " + MODEL_FILE);
+
+  }
+
+  public static void test(Instances data, String targetLabelName) throws Exception {
+    // Load the model from the file
+    if (smo == null) {
+      smo = (SMO) SerializationHelper.read(MODEL_FILE);
+    }
+
+    if (smo == null) {
+      System.out.println("Error: Model could not be loaded.");
+      return;
+    }
+
+    // Set the class index based on the target label name
+    data = convertClassToNominal(data, targetLabelName);
+    data.setClassIndex(data.attribute(targetLabelName).index());
+
+    double accuracy = evaluateModel(smo, data);
+    System.out.println("SVC Test Accuracy: " + accuracy);
   }
 
   private static double evaluateModel(Classifier model, Instances data) throws Exception {
@@ -57,4 +83,5 @@ public class svc {
     }
     return (double) correct / testData.numInstances();
   }
+
 }

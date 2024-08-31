@@ -1,4 +1,6 @@
 #include "mlpack/core/util/io.hpp"
+#include "pythonLinker.h"
+#import <Python.h>
 #include <armadillo>
 #include <iostream>
 #include <mlpack/core.hpp>
@@ -8,6 +10,9 @@
 using namespace mlpack;
 using namespace arma;
 
+extern void CallPython(const char *module_name, const char *class_name,
+                       const char *func_name, PyObject *args);
+extern void add_to_sys_path_py(const char *path);
 void SetSeedDT(int seed) {
   // Set the random seed for reproducibility
   arma::arma_rng::set_seed(seed);
@@ -15,6 +20,12 @@ void SetSeedDT(int seed) {
 }
 
 void TrainDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
+
+  Py_Initialize(); // Initialize the Python Interpreter
+  PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                      PyUnicode_FromString("emissions.csv"));
+  PyObject *pArgsStop = PyTuple_New(0);
+
   // Load dataset
   SetSeedDT(42);
   arma::mat x = data.first;
@@ -36,13 +47,20 @@ void TrainDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
   size_t numClasses = max(y) + 1;
 
   // Train the decision tree
+  CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
   DecisionTree<> dt(trainX, trainY, numClasses); // Number of classes
-
+  CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
   data::Save("./tree.bin", "tree", dt);
 }
 
 void TestDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+
+    Py_Initialize(); // Initialize the Python Interpreter
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
+
     SetSeedDT(42);
     std::cout << "Testing Decision Tree" << std::endl;
     arma::mat x = data.first;
@@ -65,7 +83,9 @@ void TestDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
     // Predict on the test set
     //
     arma::Row<size_t> predictions;
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     dt.Classify(testX, predictions);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Calculate accuracy
     double accuracy = accu(predictions == testY) / (double)testY.n_elem;

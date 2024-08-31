@@ -1,3 +1,5 @@
+#include "pythonLinker.h"
+#include <Python.h>
 #include <armadillo>
 #include <iostream>
 #include <mlpack/core/data/split_data.hpp>
@@ -17,6 +19,10 @@ void SetSeedBayes(unsigned long seed) {
 // Function to train the Naive Bayes model
 void TrainNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize();
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
     SetSeedBayes(42);
 
     // Load dataset
@@ -43,8 +49,9 @@ void TrainNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
     Ptr<NormalBayesClassifier> nb = NormalBayesClassifier::create();
 
     // Train the Naive Bayes model
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     nb->train(trainX_cv, ROW_SAMPLE, trainY_cv);
-
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
     // Save the trained model to a file
     nb->save("./naivebayes_model.xml");
 
@@ -56,6 +63,10 @@ void TrainNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
 // Function to test the Naive Bayes model
 void TestNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize();
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
     SetSeedBayes(42);
     // Load dataset
     arma::mat X = data.first;
@@ -83,7 +94,9 @@ void TestNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Predict on the test set
     cv::Mat predictions;
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     nb->predict(testX_cv, predictions);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Ensure predictions are in the correct shape
     predictions = predictions.reshape(1, testY_cv.rows);
@@ -93,6 +106,7 @@ void TestNaiveBayes(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Calculate accuracy
     cv::Mat diff;
+
     cv::compare(predictions, testY_cv, diff, cv::CmpTypes::CMP_EQ);
     double accuracy = 100.0 * cv::countNonZero(diff) / testY_cv.rows;
     std::cout << "Naive Bayes Test Accuracy: " << accuracy << "%" << std::endl;

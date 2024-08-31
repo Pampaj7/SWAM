@@ -1,3 +1,5 @@
+#include "pythonLinker.h"
+#import <Python.h>
 #include <armadillo>
 #include <iostream>
 #include <mlpack/core.hpp>
@@ -7,7 +9,6 @@
 #include <mlpack/methods/logistic_regression/logistic_regression.hpp>
 
 using namespace arma;
-
 void SetSeedLR(int seed) {
   // Set the random seed for reproducibility
   arma::arma_rng::set_seed(seed);
@@ -16,8 +17,12 @@ void SetSeedLR(int seed) {
 
 // Function to train the logistic regression model
 void TrainLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
-  // Load dataset
-  //
+
+  Py_Initialize(); // Initialize the Python Interpreter
+  PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                      PyUnicode_FromString("emissions.csv"));
+  PyObject *pArgsStop = PyTuple_New(0);
+
   SetSeedLR(42);
   arma::mat x = data.first;
   arma::Row<size_t> y = data.second;
@@ -35,7 +40,14 @@ void TrainLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
 
   // Standardize the training data
   mlpack::data::StandardScaler scaler;
+
+  // Call start_tracker
+  CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
+  Py_DECREF(pArgsStart);
+
   scaler.Fit(trainX);
+
+  CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
   scaler.Transform(trainX, trainX);
 
   // Train the logistic regression model
@@ -48,6 +60,11 @@ void TrainLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
 // Function to test the logistic regression model
 void TestLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize(); // Initialize the Python Interpreter
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
+
     SetSeedLR(42);
     arma::mat x = data.first;
     arma::Row<size_t> y = data.second;
@@ -76,7 +93,9 @@ void TestLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Predict on the test set
     arma::Row<size_t> predictions;
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     logreg.Classify(testX, predictions);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Calculate accuracy
     double accuracy = accu(predictions == testY) / (double)testY.n_elem;

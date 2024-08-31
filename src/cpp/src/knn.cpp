@@ -1,3 +1,5 @@
+#include "pythonLinker.h"
+#include <Python.h>
 #include <armadillo>
 #include <iostream>
 #include <mlpack/core/data/split_data.hpp>
@@ -16,6 +18,10 @@ void SetSeedKNN(unsigned long seed) {
 // Function to train the KNN model
 void TrainKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize(); // Initialize the Python Interpreter
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
     SetSeedKNN(42);
     // Load dataset
     arma::mat X = data.first;
@@ -43,7 +49,9 @@ void TrainKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
     knn->setIsClassifier(true);
 
     // Train the KNN model
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     knn->train(trainX_cv, ROW_SAMPLE, trainY_cv);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Save the trained model to a file
     knn->save("./knn_model.xml");
@@ -56,6 +64,10 @@ void TrainKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
 // Function to test the KNN model
 void TestKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize(); // Initialize the Python Interpreter
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
     SetSeedKNN(42);
     // Load dataset
     arma::mat X = data.first;
@@ -82,7 +94,9 @@ void TestKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Predict on the test set
     cv::Mat predictions;
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     knn->findNearest(testX_cv, knn->getDefaultK(), predictions);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Ensure predictions are in the correct shape
     predictions = predictions.reshape(1, testY_cv.rows);

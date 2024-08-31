@@ -32,13 +32,14 @@ public class main {
   }
 
   public static void main(String[] args) {
-    if (args.length < 2) {
+    if (args.length < 3) {
       System.out.println("Usage: java Main <dataset_name> <algorithm>");
-      System.out.println("Available algorithms: logreg, decisiontree, randomforest, xgboost, svc, knn");
+      System.out.println("Available algorithms: logisticregression, decisiontree, randomforest, xgboost, svc, knn");
       return;
     }
     String datasetName = args[0];
     String algorithm = args[1];
+    String train = args[2];
     Instances data = loadDataset(datasetName);
     String targetLabel = "";
     switch (datasetName) {
@@ -61,22 +62,42 @@ public class main {
     try {
       switch (algorithm.toLowerCase()) {
         case "logisticregression":
-          logreg.train(data, targetLabel);
+          if (train.equals("true")) {
+            logreg.train(data, targetLabel);
+          } else {
+            logreg.test(data, targetLabel);
+          }
           break;
         case "decisiontree":
-          decisiontree.train(data, targetLabel);
+          if (train.equals("true")) {
+            decisiontree.train(data, targetLabel);
+          } else {
+            decisiontree.test(data, targetLabel);
+          }
           break;
         case "randomforest":
-          randomforest.train(data, targetLabel);
+          if (train.equals("true")) {
+            randomforest.train(data, targetLabel);
+          } else {
+            randomforest.test(data, targetLabel);
+          }
           break;
         case "xgboost":
           xgboost.train(data, targetLabel);
           break;
         case "svc":
-          svc.train(data, targetLabel);
+          if (train.equals("true")) {
+            svc.train(data, targetLabel);
+          } else {
+            svc.test(data, targetLabel);
+          }
           break;
         case "knn":
-          knn.train(data, targetLabel);
+          if (train.equals("true")) {
+            knn.train(data, targetLabel);
+          } else {
+            knn.test(data, targetLabel);
+          }
           break;
         default:
           System.out.println("Unknown algorithm: " + algorithm);

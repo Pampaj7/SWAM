@@ -1,4 +1,5 @@
-
+#include "pythonLinker.h"
+#include <Python.h>
 #include <armadillo>
 #include <iostream>
 #include <mlpack/core.hpp>
@@ -15,6 +16,10 @@ void SetSeedAda(unsigned long seed) {
 // Function to train the AdaBoost model
 void TrainAdaBoost(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize();
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
     SetSeedAda(42);
     // Load dataset
     arma::mat X = data.first;
@@ -37,7 +42,9 @@ void TrainAdaBoost(std::pair<arma::mat, arma::Row<size_t>> data) {
     const size_t numClasses = 2; // Number of classes (adjust as needed)
 
     // Create and train the AdaBoost model
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     AdaBoost<> adaboost(trainX, trainY, numTrees, numClasses);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Save the trained model to a file
     mlpack::data::Save("./adaboost_model.xml", "adaboost_model", adaboost);
@@ -50,6 +57,10 @@ void TrainAdaBoost(std::pair<arma::mat, arma::Row<size_t>> data) {
 // Function to test the AdaBoost model
 void TestAdaBoost(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize(); // Initialize the Python Interpreter
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
     SetSeedAda(42);
     // Load dataset
     arma::mat X = data.first;
@@ -73,7 +84,9 @@ void TestAdaBoost(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Predict on the test set
     arma::Row<size_t> predictions;
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     adaboost.Classify(testX, predictions);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Calculate accuracy
     double accuracy = accu(predictions == testY) / (double)testY.n_elem;

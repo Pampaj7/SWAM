@@ -1,3 +1,5 @@
+#include "pythonLinker.h"
+#include <Python.h>
 #include <armadillo>
 #include <iostream>
 #include <mlpack/core.hpp>
@@ -16,6 +18,12 @@ void SetSeedRF(int seed) {
 // Function to train the Random Forest model
 void TrainRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+
+    Py_Initialize(); // Initialize the Python Interpreter
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
+
     SetSeedRF(42);
     // Load dataset
     arma::mat X = data.first;
@@ -37,12 +45,16 @@ void TrainRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
     // Set the seed for reproducibility
     arma::arma_rng::set_seed(42);
 
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     // Create and train the RandomForest model
     RandomForest<> rf(trainX, trainY, numTrees, numClasses, minimumLeafSize,
                       computeImportance, maxDepth);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Save the model to a file
     data::Save("./random_forest_model.bin", "rf_model", rf);
+    std::cout << "Random Forest model saved to 'random_forest_model.bin'"
+              << std::endl;
 
   } catch (const std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;
@@ -52,6 +64,10 @@ void TrainRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
 // Function to test the Random Forest model
 void TestRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
   try {
+    Py_Initialize(); // Initialize the Python Interpreter
+    PyObject *pArgsStart = PyTuple_Pack(2, PyUnicode_FromString("output"),
+                                        PyUnicode_FromString("emissions.csv"));
+    PyObject *pArgsStop = PyTuple_New(0);
     SetSeedRF(42);
     // Load dataset
     arma::mat X = data.first;
@@ -69,7 +85,9 @@ void TestRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Predict on the test set
     arma::Row<size_t> predictions;
+    CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
     rf.Classify(testX, predictions);
+    CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
 
     // Calculate accuracy
     double accuracy = accu(predictions == testY) / (double)testY.n_elem;

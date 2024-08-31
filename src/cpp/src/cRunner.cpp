@@ -1,4 +1,3 @@
-
 #include "Adaboost.cpp"
 #include "DecisionTree.cpp"
 #include "RandomForest.cpp"
@@ -7,6 +6,7 @@
 #include "loader.cpp"
 #include "logreg.cpp"
 #include "naiveBayes.cpp"
+#include "pythonLinker.cpp"
 #include "svc.cpp"
 #include <iostream>
 
@@ -93,7 +93,6 @@ int main(int argc, char *argv[]) {
     Test = false;
   }
 
-  // Load dataset
   auto dataset = loadDataset(datasetName);
 
   // Determine which algorithm to run
