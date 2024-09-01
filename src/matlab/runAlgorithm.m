@@ -3,6 +3,7 @@ function runAlgo(algorithm, dataset)
     pyenv('Version', '/Users/pampaj/anaconda3/envs/sw/bin/python');
     insert(py.sys.path, int32(0), '/Users/pampaj/PycharmProjects/SWAM/src/matlab/');
 
+    % Seleziona il dataset
     switch dataset
         case 'breastCancer'
             data = readtable('../datasets/breastcancer/breastcancer.csv');
@@ -42,6 +43,11 @@ function runAlgo(algorithm, dataset)
     y_train = y(training(cv));
     y_test = y(test(cv));
 
+    % Rimuove le feature con varianza nulla per evitare errori in Naive Bayes
+    zeroVarianceIdx = var(X_train) == 0;
+    X_train(:, zeroVarianceIdx) = [];
+    X_test(:, zeroVarianceIdx) = [];
+
     % Inizio tracciamento prima del fitting
     py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
 
@@ -49,9 +55,8 @@ function runAlgo(algorithm, dataset)
     switch algorithm
         case 'logisticRegression'
             model = fitcecoc(X_train, y_train, 'Learners', 'linear');
-        case 'XGBoost'
-            % Nota: MATLAB non ha una funzione diretta per XGBoost, quindi usa un'alternativa o libreria se disponibile
-            model = fitcensemble(X_train, y_train, 'Method', 'Bag', 'Learners', 'tree');
+        case 'adaBoost'
+            model = fitcensemble(X_train, y_train, 'Method', 'RUSBoost');
         case 'decisionTree'
             model = fitctree(X_train, y_train);
         case 'randomForest'
@@ -60,9 +65,8 @@ function runAlgo(algorithm, dataset)
             model = fitcknn(X_train, y_train, 'NumNeighbors', 5);
         case 'SVC'
             model = fitcecoc(X_train, y_train);
-        case 'GMM'
-            options = statset('MaxIter', 1000, 'TolFun', 1e-5);
-            model = fitgmdist(X_train, 3, 'Options', options, 'CovarianceType', 'diagonal', 'RegularizationValue', 0.1); %regiularizan value is added!
+        case 'naiveBayes'
+            model = fitcnb(X_train, y_train, 'DistributionNames', 'kernel');
         otherwise
             error('Algorithm unknown');
     end
@@ -74,12 +78,8 @@ function runAlgo(algorithm, dataset)
     py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_test_emissions.csv', algorithm, dataset));
 
     % Calcola le predizioni
-    switch algorithm
-        case 'GMM'
-            y_pred = cluster(model, X_test);
-        otherwise
-            y_pred = predict(model, X_test);
-    end
+
+    y_pred = predict(model, X_test);
 
     % Stop tracciamento dopo la predizione
     py.tracker_control.stop_tracker();

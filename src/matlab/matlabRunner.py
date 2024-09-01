@@ -2,6 +2,8 @@ import matlab.engine
 import pandas as pd
 import os
 
+epochs = 2
+
 # Percorso della cartella contenente i file da eliminare
 directory_path = 'matlab/models'
 
@@ -28,34 +30,32 @@ if os.path.exists(file):
 else:
     print(f"{file} non esiste.")
 
-epochs = 1
-# Lista di combinazioni algoritmo-dataset
 combinations = [
     ("logisticRegression", "breastCancer"),
-    ("XGBoost", "breastCancer"),
+    ("adaBoost", "breastCancer"),
     ("decisionTree", "breastCancer"),
     ("randomForest", "breastCancer"),
     ("KNN", "breastCancer"),
     ("SVC", "breastCancer"),
-    ("GMM", "breastCancer"),
+    ("naiveBayes", "breastCancer"),
     ("logisticRegression", "iris"),
-    ("XGBoost", "iris"),
+    ("adaBoost", "iris"),
     ("decisionTree", "iris"),
     ("randomForest", "iris"),
     ("KNN", "iris"),
     ("SVC", "iris"),
-    ("GMM", "iris"),
+    ("naiveBayes", "iris"),
     ("logisticRegression", "wine"),
-    ("XGBoost", "wine"),
+    ("adaBoost", "wine"),
     ("decisionTree", "wine"),
     ("randomForest", "wine"),
     ("KNN", "wine"),
     ("SVC", "wine"),
-    ("GMM", "wine"),
+    ("naiveBayes", "wine"),
 ]
 
 
-def processCsv():
+def processCsv(language):
     # Percorso della cartella contenente i file CSV
     directory_path = 'matlab/models/'
 
@@ -76,7 +76,7 @@ def processCsv():
                     algorithm = parts[0]
                     dataset = parts[1]
                     phase = parts[2]
-                    language = 'matlab'  # Come specificato
+                    language = language  # Come specificato
 
                     # Carica il file CSV in un DataFrame
                     df = pd.read_csv(file_path)
@@ -141,5 +141,5 @@ for algorithm, dataset in combinations:
         runMatlabScript(eng, algorithm, dataset)
 eng.quit()
 
-processCsv()
+processCsv('matlab')
 mergeCsvFiles("matlab/models", "matlab/emission_detailed.csv")

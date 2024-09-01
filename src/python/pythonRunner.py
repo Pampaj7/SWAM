@@ -1,18 +1,17 @@
 import pandas as pd
-from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-from xgboost import XGBClassifier
 from codecarbon import EmissionsTracker
+from sklearn.naive_bayes import GaussianNB
 import os
 
-epochs = 1
+epochs = 2
 
 # Percorso del file
 file_path = ['python/train_emissions_detailed.csv', "python/test_emissions_detailed.csv",
@@ -31,19 +30,16 @@ algorithms = {
     LogisticRegression(
         random_state=42, max_iter=10000, class_weight="balanced"
     ): "logisticRegression",
-    XGBClassifier(
-        random_state=42,
-        n_estimators=100,
-        use_label_encoder=False,
-        eval_metric="logloss",
-    ): "XGBoost",
+    AdaBoostClassifier(random_state=42, n_estimators=100): "AdaBoost",
+
     DecisionTreeClassifier(random_state=42, class_weight="balanced"): "decisionTree",
     RandomForestClassifier(
         random_state=42, n_estimators=100, class_weight="balanced"
     ): "randomForest",
     KNeighborsClassifier(n_neighbors=5): "KNN",
     SVC(kernel="linear", random_state=42, class_weight="balanced"): "SVC",
-    GaussianMixture(n_components=3, random_state=42): "GMM",
+    GaussianNB(): "naiveBayes",
+
 }
 
 
@@ -193,12 +189,12 @@ def add_columns(file_path, language):
     # Lista degli algoritmi in ordine
     algorithms_order = [
         "logisticRegression",
-        "XGBoost",
+        "adaBoost",
         "decisionTree",
         "randomForest",
         "KNN",
         "SVC",
-        "GMM",
+        "naiveBayes",
     ]
 
     # Lista dei dataset in ordine
