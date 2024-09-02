@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+from R.handleCsv import processCsv
 
 from codecarbon import EmissionsTracker
 import pandas as pd
@@ -14,9 +15,15 @@ def mainR():
         "randomForest",
         "KNN",
         "SVC",
+        "adaBoost",
+        "naiveBayes"
     ]
     repetition = 1
     savePath = "R/csv"
+    language = "R"
+
+    removeFile("emissions_detailed.csv")
+    removeFolderFiles(savePath)
 
     for dataset in datasets:
         for algorithm in algorithms:
@@ -30,6 +37,7 @@ def mainR():
                 # Print the result
                 handle_subprocess_result(result)
                 time.sleep(1)
+    processCsv(language, savePath)
 
 
 def run_r_script(dataset, algorithm, savePath):
@@ -39,13 +47,20 @@ def run_r_script(dataset, algorithm, savePath):
     return subResult
 
 
-def remove(filename):
+def removeFile(filename):
     try:
         os.remove(f"R/{filename}")
     except FileNotFoundError:
         print("emission.csv doesn't exist yet")
     except Exception as e:
         print(f"error occurred: {e}")
+
+
+def removeFolderFiles(folder):
+    for filename in os.listdir(folder):
+        if filename.endswith('.csv'):
+            removeFile(f"csv/{filename}")
+
 
 
 def handle_subprocess_result(result: subprocess.CompletedProcess):
@@ -60,5 +75,5 @@ def handle_subprocess_result(result: subprocess.CompletedProcess):
 
 
 def maintest():
-    result = run_r_script("wine", "SVC", "R/csv")
-    handle_subprocess_result(result)
+    processCsv("R", "R/csv")
+

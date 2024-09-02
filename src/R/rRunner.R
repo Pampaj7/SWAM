@@ -10,6 +10,7 @@ library(xgboost)
 library(e1071)
 library(mclust)
 library(reticulate)
+library(adabag)
 
 
 set.seed(42)
@@ -285,6 +286,72 @@ train_svc_classifier <- function(data, target, savePath, fileName, train_split =
         confusion_matrix = confusion_matrix
     ))
 }
+train_naive_bayes <- function(data, target, savePath, fileName, train_split = 0.8, seed = 42) {
+  # Convert the target column to a factor
+  data[[target]] <- as.factor(data[[target]])
+
+  # Split the data into training and test sets
+  set.seed(seed)
+  trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
+  trainData <- data[trainIndex, ]
+  testData <- data[-trainIndex, ]
+
+  # Train the Naive Bayes model
+  formula <- as.formula(paste(target, "~ ."))
+
+  start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
+  nbModel <- naiveBayes(formula, data = trainData)
+  stop_tracker()
+
+  # Predict on the test set
+  start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
+  predictions <- predict(nbModel, newdata = testData)
+  stop_tracker()
+
+  # Compute the confusion matrix
+  confMatrix <- confusionMatrix(predictions, testData[[target]])
+
+  # Return the trained model and the confusion matrix
+  return(list(model = nbModel, confusion_matrix = confMatrix))
+}
+train_adaboost <- function(data, target, savePath, fileName, train_split = 0.8, nIter = 50, seed = 42) {
+  # # Load necessary library
+  # if (!requireNamespace("adabag", quietly = TRUE)) {
+  #   install.packages("adabag")
+  # }
+  # library(adabag)
+
+  # Convert the target column to a factor
+  data[[target]] <- as.factor(data[[target]])
+
+  # Split the data into training and test sets
+  set.seed(seed)
+  trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
+  trainData <- data[trainIndex, ]
+  testData <- data[-trainIndex, ]
+
+  # Train the AdaBoost model
+  formula <- as.formula(paste(target, "~ ."))
+
+  start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
+  adaboostModel <- boosting(formula, data = trainData, boos = TRUE, mfinal = nIter)
+  stop_tracker()
+
+  # Predict on the test set
+  start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
+  predictions <- predict.boosting(adaboostModel, newdata = testData)
+  stop_tracker()
+
+  # Compute the confusion matrix
+  confMatrix <- confusionMatrix(predictions$class, testData[[target]])
+
+  # Return the trained model and the confusion matrix
+  return(list(model = adaboostModel, confusion_matrix = confMatrix))
+}
+
+
+
+
 
 run_model_with_dataset <- function(datasetName, algorithmName, savePath){
   dataset <- switch (datasetName,
@@ -302,6 +369,8 @@ run_model_with_dataset <- function(datasetName, algorithmName, savePath){
     "KNN" = train_knn(data = dataMatrix, target = targetValue, savePath = savePath, fileName = name),
     "logisticRegression" = train_logistic_regression(data = dataMatrix, target = targetValue, savePath = savePath, fileName = name),
     "SVC" = train_svc_classifier(data = dataMatrix, target = targetValue, savePath = savePath, fileName = name),
+    "naiveBayes" = train_naive_bayes(data = dataMatrix, target = targetValue, savePath = savePath, fileName = name),
+    "adaBoost" = train_naive_bayes(data = dataMatrix, target = targetValue, savePath = savePath, fileName = name),
     stop("invalid algorithm name")
   )
   return(result)
