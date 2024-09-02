@@ -124,7 +124,7 @@ def main():
         "KNN",
         "SVC",
         # "GMM",
-        "AdaBoost",
+        "adaBoost",
         "naiveBayes",
     ]
     repetition = 1

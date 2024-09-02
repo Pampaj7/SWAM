@@ -69,7 +69,7 @@ Algs getAlgorithmFromString(const std::string &algo) {
     return KNN;
   if (algo == "SVC")
     return SVC;
-  if (algo == "AdaBoost")
+  if (algo == "adaBoost")
     return ADABOOST;
   if (algo == "naiveBayes")
     return NAIVEBAYES;
