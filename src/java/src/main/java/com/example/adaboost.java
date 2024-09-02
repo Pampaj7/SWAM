@@ -1,19 +1,18 @@
 package com.example;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.SMO;
+import weka.classifiers.meta.AdaBoostM1;
 import weka.core.Instances;
+import weka.core.SerializationHelper;
+import weka.core.Utils;
+import weka.classifiers.Evaluation;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
-import weka.core.SerializationHelper;
-import weka.classifiers.Evaluation;
 
-import java.util.Random;
+public class adaboost {
 
-public class svc {
-
-  private static final String MODEL_FILE = "svcModel.model";
-  private static SMO smo;
+  private static final String MODEL_FILE = "adaboostModel.model";
+  private static AdaBoostM1 adaboost;
   private static PythonHandler pythonHandler = new PythonHandler();
 
   public static Instances convertClassToNominal(Instances data, String targetLabelName) throws Exception {
@@ -37,24 +36,25 @@ public class svc {
     data = convertClassToNominal(data, targetLabelName);
     data.setClassIndex(data.attribute(targetLabelName).index());
 
-    // Create and configure the SVC (SMO) model
-    smo = new SMO();
+    // Create and configure the AdaBoost model
+    adaboost = new AdaBoostM1();
+    adaboost.setClassifier(new weka.classifiers.functions.SMO()); // Use SMO as the base classifier
     pythonHandler.startTracker("emissions.csv");
-    smo.buildClassifier(data);
+    adaboost.buildClassifier(data);
     pythonHandler.stopTracker();
 
     // Save the model to a file
-    SerializationHelper.write(MODEL_FILE, smo);
+    SerializationHelper.write(MODEL_FILE, adaboost);
     System.out.println("Model saved to " + MODEL_FILE);
   }
 
   public static void test(Instances data, String targetLabelName) throws Exception {
     // Load the model from the file
-    if (smo == null) {
-      smo = (SMO) SerializationHelper.read(MODEL_FILE);
+    if (adaboost == null) {
+      adaboost = (AdaBoostM1) SerializationHelper.read(MODEL_FILE);
     }
 
-    if (smo == null) {
+    if (adaboost == null) {
       System.out.println("Error: Model could not be loaded.");
       return;
     }
@@ -64,12 +64,11 @@ public class svc {
     data.setClassIndex(data.attribute(targetLabelName).index());
 
     // Evaluate the model using Weka's Evaluation class
-    Evaluation evaluation = evaluateModel(smo, data);
-    System.out.println("SVC Test Accuracy: " + evaluation.pctCorrect());
-
+    Evaluation evaluation = evaluateModel(adaboost, data);
+    System.out.println("AdaBoost Test Accuracy: " + evaluation.pctCorrect());
   }
 
-  private static Evaluation evaluateModel(SMO model, Instances data) throws Exception {
+  private static Evaluation evaluateModel(AdaBoostM1 model, Instances data) throws Exception {
     // Perform a train-test split
     int trainSize = (int) (data.numInstances() * 0.8);
     int testSize = data.numInstances() - trainSize;

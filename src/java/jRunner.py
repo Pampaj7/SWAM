@@ -1,6 +1,80 @@
 import subprocess
 from codecarbon import EmissionsTracker
 import pandas as pd
+import os
+
+
+def processCsv():
+    # Percorso della cartella contenente i file CSV
+    directory_path = "output/"
+
+    # Verifica se la cartella esiste
+    if not os.path.exists(directory_path):
+        print(f"La cartella {directory_path} non esiste.")
+    else:
+        # Elenco di tutti i file nella cartella
+        for file_name in os.listdir(directory_path):
+            if file_name.endswith(".csv"):
+                file_path = os.path.join(directory_path, file_name)
+
+                # Estrai informazioni dal nome del file
+                base_name = os.path.splitext(file_name)[0]
+                parts = base_name.split("_")
+
+                if len(parts) == 4:
+                    algorithm = parts[0]
+                    dataset = parts[1]
+                    phase = parts[2]
+                    language = "java"  # Come specificato
+
+                    # Carica il file CSV in un DataFrame
+                    df = pd.read_csv(file_path)
+
+                    # Aggiungi le nuove colonne
+                    df["algorithm"] = algorithm
+                    df["dataset"] = dataset
+                    df["language"] = language
+                    df["phase"] = phase
+
+                    # Salva il DataFrame aggiornato
+                    updated_file_path = os.path.join(directory_path, file_name)
+                    df.to_csv(updated_file_path, index=False)
+
+                    print(f"Aggiornato: {updated_file_path}")
+                else:
+                    print(f"Nome del file non valido per: {file_name}")
+
+
+def mergeCsvFiles(directory_path, merged_file_path):
+    """
+    Unisce tutti i file CSV presenti nella directory specificata e salva il risultato in un nuovo file CSV.
+
+    Parameters:
+    - directory_path: Percorso della directory contenente i file CSV da unire.
+    - merged_file_path: Percorso del file CSV finale dove verranno salvati i dati uniti.
+    """
+    # Elenco di tutti i file nella cartella
+    all_files = [
+        os.path.join(directory_path, file_name)
+        for file_name in os.listdir(directory_path)
+        if file_name.endswith(".csv")
+    ]
+
+    # Lista per memorizzare i DataFrame
+    dfs = []
+
+    # Leggi e aggiungi ogni file CSV alla lista di DataFrame
+    for file in all_files:
+        df = pd.read_csv(file)
+        dfs.append(df)
+
+    # Unisci tutti i DataFrame in uno solo
+    merged_df = pd.concat(dfs, ignore_index=True)
+
+    # Salva il DataFrame unito in un nuovo file CSV
+    merged_df.to_csv(merged_file_path, index=False)
+
+    print(f"File CSV uniti e salvati in {merged_file_path}")
 
 
 # WATCHOUT!!!! first compile the java file with javac script.java and then run it with java script. now works with allRunner.py
@@ -16,7 +90,7 @@ def compile_java():
         print(e.stderr)
 
 
-def run_java_program(dataset, algorithm):
+def run_java_program(dataset, algorithm, train):
     # compile_java()
     try:
         # Esegui il programma Java
@@ -25,7 +99,7 @@ def run_java_program(dataset, algorithm):
                 "mvn",
                 "exec:java",
                 "-Dexec.mainClass=com.example.main",
-                f"-Dexec.args={dataset} {algorithm}",
+                f"-Dexec.args={dataset} {algorithm} {train}",
             ],
             capture_output=True,
             # text=True,
@@ -44,12 +118,14 @@ def main():
     datasets = ["breastCancer", "wine", "iris"]
     algorithms = [
         "logisticRegression",
-        "XGBoost",
+        # "XGBoost",
         "decisionTree",
         "randomForest",
         "KNN",
         "SVC",
         # "GMM",
+        "AdaBoost",
+        "naiveBayes",
     ]
     repetition = 1
     new_data = []
@@ -65,31 +141,28 @@ def main():
                     output_dir="java", output_file="emissions.csv"
                 )
                 # TODO: overwrite emission.csv or delete every time
-                tracker.start()
 
                 print("Executing java script:")
                 print(f"with {dataset} , {algorithm}")
 
                 # Run the model and capture the result
-                run_java_program(dataset, algorithm)
+                run_java_program(dataset, algorithm, "true")
 
-                tracker.stop()
-
-                # Print the result
-
-                new_data.append(
-                    {"algorithm": algorithm, "dataset": dataset, "language": "java"}
+                os.rename(
+                    "./output/emissions.csv",
+                    f"./output/{algorithm}_{dataset}_train_emissions.csv",
                 )
 
-    emissions_df = pd.read_csv("emissions.csv")
-    new_data_df = pd.DataFrame(new_data)
-    assert len(new_data_df) == len(
-        emissions_df
-    ), "Mismatch in row count between emissions data and new columns."
-    emissions_df = pd.concat([emissions_df, new_data_df], axis=1)
-    emissions_df.to_csv(f"{new_csv_filename}", index=False)
+                run_java_program(dataset, algorithm, "true")
 
-    print(f"{new_csv_filename} has been created with new columns.")
+                os.rename(
+                    "./output/emissions.csv",
+                    f"./output/{algorithm}_{dataset}_test_emissions.csv",
+                )
+    processCsv()
+    mergeCsvFiles("output/", "emissions_detailed.csv")
+
+    # Print the result
 
 
 # main

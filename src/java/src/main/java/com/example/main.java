@@ -99,6 +99,20 @@ public class main {
             knn.test(data, targetLabel);
           }
           break;
+        case "naivebayes":
+          if (train.equals("true")) {
+            naivebayes.train(data, targetLabel);
+          } else {
+            naivebayes.test(data, targetLabel);
+          }
+          break;
+        case "adaboost":
+          if (train.equals("true")) {
+            adaboost.train(data, targetLabel);
+          } else {
+            adaboost.test(data, targetLabel);
+          }
+          break;
         default:
           System.out.println("Unknown algorithm: " + algorithm);
           System.out.println("Available algorithms: logreg, decisiontree, randomforest, xgboost, svc, knn");

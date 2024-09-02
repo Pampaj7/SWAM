@@ -2,35 +2,31 @@ package com.example;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
-import weka.core.Attribute;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
-
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
+import weka.classifiers.Evaluation;
 
 public class knn {
 
   private static final String MODEL_FILE = "knnModel.model";
   private static IBk knn;
+  private static PythonHandler pythonHandler = new PythonHandler();
 
   public static void train(Instances data, String targetLabelName) throws Exception {
+    // Set the class index based on the target label name
     int targetIndex = data.attribute(targetLabelName).index();
     data.setClassIndex(targetIndex);
-
-    // Set the class index based on the target label name
 
     // Create and configure the k-NN model
     knn = new IBk();
     knn.setKNN(3); // Set k to 3 for example
+    pythonHandler.startTracker("emissions.csv");
     knn.buildClassifier(data);
+    pythonHandler.stopTracker();
 
     // Save the model to a file
     SerializationHelper.write(MODEL_FILE, knn);
     System.out.println("Model saved to " + MODEL_FILE);
-
   }
 
   public static void test(Instances data, String targetLabelName) throws Exception {
@@ -45,30 +41,27 @@ public class knn {
     }
 
     // Set the class index based on the target label name
-    data.setClassIndex(data.attribute(targetLabelName).index());
+    int targetIndex = data.attribute(targetLabelName).index();
+    data.setClassIndex(targetIndex);
 
-    double accuracy = evaluateModel(knn, data);
-    System.out.println("k-NN Test Accuracy: " + accuracy * 100 + "%");
+    // Evaluate the model using Weka's Evaluation class
+    Evaluation evaluation = evaluateModel(knn, data);
+    System.out.println("k-NN Test Accuracy: " + evaluation.pctCorrect());
   }
 
-  private static double evaluateModel(Classifier model, Instances data) throws Exception {
+  private static Evaluation evaluateModel(IBk model, Instances data) throws Exception {
     // Perform a train-test split
     int trainSize = (int) (data.numInstances() * 0.8);
     int testSize = data.numInstances() - trainSize;
     Instances trainData = new Instances(data, 0, trainSize);
     Instances testData = new Instances(data, trainSize, testSize);
 
-    // Evaluate the model
-    int correct = 0;
-    for (int i = 0; i < testData.numInstances(); i++) {
-      double actualClass = testData.instance(i).classValue();
-      double predictedClass = model.classifyInstance(testData.instance(i));
+    // Initialize Evaluation object
+    Evaluation evaluation = new Evaluation(trainData);
+    pythonHandler.startTracker("emissions.csv");
+    evaluation.evaluateModel(model, testData);
+    pythonHandler.stopTracker();
 
-      if (actualClass == predictedClass) {
-        correct++;
-      }
-    }
-    return (double) correct / testData.numInstances();
+    return evaluation;
   }
-
 }

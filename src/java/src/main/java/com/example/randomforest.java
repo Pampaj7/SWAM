@@ -20,6 +20,7 @@ public class randomforest {
 
   private static RandomForest forest;
   private static final String MODEL_FILE = "randomForestModel.model";
+  private static PythonHandler pythonHandler = new PythonHandler();
 
   public static void train(Instances data, String targetLabel) {
     try {
@@ -64,7 +65,9 @@ public class randomforest {
       forest = new RandomForest();
       forest.setNumIterations(100); // Number of trees in the forest
       forest.setSeed(42); // Random seed
+      pythonHandler.startTracker("emissions.csv");
       forest.buildClassifier(trainData);
+      pythonHandler.stopTracker();
       // Save the model to a file
       SerializationHelper.write(MODEL_FILE, forest);
       System.out.println("Model saved to " + MODEL_FILE);
@@ -124,7 +127,9 @@ public class randomforest {
 
       // Evaluate the model on the testing data
       Evaluation evaluation = new Evaluation(split[0]);
+      pythonHandler.startTracker("emissions");
       evaluation.evaluateModel(forest, testData);
+      pythonHandler.stopTracker();
 
       // Print accuracy and classification report
       System.out.println("RF Accuracy: " + evaluation.pctCorrect() + "%");

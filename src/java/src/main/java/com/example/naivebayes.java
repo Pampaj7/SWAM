@@ -2,90 +2,87 @@ package com.example;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.core.Attribute;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.attribute.NumericToNominal;
+import weka.core.SerializationHelper;
 import weka.classifiers.Evaluation;
 
 import java.util.Random;
 
 public class naivebayes {
 
-  public static void train(Instances data, String targetLabel) {
-    try {
-      // Set the class index based on the target label
-      Attribute classAttribute = data.attribute(targetLabel);
-      if (classAttribute == null) {
-        System.out.println("Error: Target label '" + targetLabel + "' not found in the dataset.");
-        return;
-      }
-      data.setClass(classAttribute);
+  private static final String MODEL_FILE = "naiveBayesModel.model";
+  private static NaiveBayes naiveBayes;
+  private static PythonHandler pythonHandler = new PythonHandler();
 
-      // Convert class attribute to nominal if it's numeric
-      if (classAttribute.isNumeric()) {
-        NumericToNominal filter = new NumericToNominal();
-        filter.setAttributeIndices("" + (data.classIndex() + 1)); // Class index is 1-based in the filter
-        filter.setInputFormat(data);
-        data = Filter.useFilter(data, filter);
-        System.out.println("Converted numeric class attribute to nominal.");
-      }
+  public static Instances convertClassToNominal(Instances data, String targetLabelName) throws Exception {
+    int targetIndex = data.attribute(targetLabelName).index();
+    data.setClassIndex(targetIndex);
 
-      // Apply standardization to features
-      Standardize standardizeFilter = new Standardize();
-      standardizeFilter.setInputFormat(data);
-      Instances standardizedData = Filter.useFilter(data, standardizeFilter);
-
-      // Stratify and split the data: 80% train, 20% test with random seed
-      Instances[] split = stratifiedSplit(standardizedData, 0.8, 42);
-      Instances train = split[0];
-      Instances test = split[1];
-
-      // Create and train the Naive Bayes classifier
-      Classifier classifier = new NaiveBayes();
-      classifier.buildClassifier(train);
-
-      // Evaluate the classifier on the test set
-      Evaluation evaluation = new Evaluation(train);
-      evaluation.evaluateModel(classifier, test);
-
-      // Output the accuracy
-      System.out.println("Naive Bayes Accuracy: " + evaluation.pctCorrect() + "%");
-
-    } catch (Exception e) {
-      e.printStackTrace();
+    // Apply NumericToNominal filter if the class attribute is numeric
+    if (data.classAttribute().isNumeric()) {
+      NumericToNominal convert = new NumericToNominal();
+      String[] options = new String[] { "-R", String.valueOf(targetIndex + 1) };
+      convert.setOptions(options);
+      convert.setInputFormat(data);
+      data = Filter.useFilter(data, convert);
     }
+
+    return data;
   }
 
-  // Function to split data into train and test sets (stratified split)
-  private static Instances[] stratifiedSplit(Instances data, double trainRatio, int seed) throws Exception {
-    // Ensure the data is randomized before splitting
-    Random rand = new Random(seed);
-    data.randomize(rand);
+  public static void train(Instances data, String targetLabelName) throws Exception {
+    // Set the class index based on the target label name
+    data = convertClassToNominal(data, targetLabelName);
+    data.setClassIndex(data.attribute(targetLabelName).index());
 
-    // Split the dataset
-    int trainSize = (int) Math.round(data.numInstances() * trainRatio);
+    // Create and configure the NaiveBayes model
+    naiveBayes = new NaiveBayes();
+    pythonHandler.startTracker("emissions.csv");
+    naiveBayes.buildClassifier(data);
+    pythonHandler.stopTracker();
+
+    // Save the model to a file
+    SerializationHelper.write(MODEL_FILE, naiveBayes);
+    System.out.println("Model saved to " + MODEL_FILE);
+  }
+
+  public static void test(Instances data, String targetLabelName) throws Exception {
+    // Load the model from the file
+    if (naiveBayes == null) {
+      naiveBayes = (NaiveBayes) SerializationHelper.read(MODEL_FILE);
+    }
+
+    if (naiveBayes == null) {
+      System.out.println("Error: Model could not be loaded.");
+      return;
+    }
+
+    // Set the class index based on the target label name
+    data = convertClassToNominal(data, targetLabelName);
+    data.setClassIndex(data.attribute(targetLabelName).index());
+
+    // Evaluate the model using Weka's Evaluation class
+    double accuracy = evaluateModel(naiveBayes, data);
+    System.out.println("Naive Bayes Test Accuracy: " + accuracy);
+  }
+
+  private static double evaluateModel(Classifier model, Instances data) throws Exception {
+    // Perform a train-test split
+    int trainSize = (int) (data.numInstances() * 0.8);
     int testSize = data.numInstances() - trainSize;
+    Instances trainData = new Instances(data, 0, trainSize);
+    Instances testData = new Instances(data, trainSize, testSize);
 
-    Instances train = new Instances(data, 0, trainSize);
-    Instances test = new Instances(data, trainSize, testSize);
+    // Initialize Evaluation object
+    Evaluation evaluation = new Evaluation(trainData);
+    pythonHandler.startTracker("emissions.csv");
+    evaluation.evaluateModel(model, testData);
+    pythonHandler.stopTracker();
 
-    return new Instances[] { train, test };
-  }
+    // Print detailed evaluation results
 
-  public static void main(String[] args) {
-    try {
-      // Load the dataset
-      DataSource source = new DataSource("path/to/your/dataset.arff");
-      Instances data = source.getDataSet();
-
-      // Call the train method with the target label
-      train(data, "targetLabel"); // Replace "targetLabel" with the actual target attribute name
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    return evaluation.pctCorrect() / 100.0;
   }
 }
