@@ -142,4 +142,4 @@ for algorithm, dataset in combinations:
 eng.quit()
 
 processCsv('matlab')
-mergeCsvFiles("matlab/models", "matlab/emission_detailed.csv")
+mergeCsvFiles("matlab/models", "matlab/emissions_detailed.csv")
