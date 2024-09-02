@@ -110,22 +110,24 @@ def plot(df, x_axis=None, y_axis=None, plotType="barPlot", save_path=None, hist_
             f"Invalid plot type '{plotType}'. Valid options are 'barPlot', 'boxPlot', 'violinPlot', 'histogram', 'pairplot', 'heatmap'.")
 
 
-def mean_unique_triplets(df: pd.DataFrame, *args: str):
-    missing_columns = [col for col in args if col not in df.columns]
+def mean_unique_quadruplets(df: pd.DataFrame, columns: list[str]):
+    # Check if all provided columns exist in the DataFrame
+    missing_columns = [col for col in columns if col not in df.columns]
     if missing_columns:
         raise ValueError(f"Columns not found in DataFrame: {', '.join(missing_columns)}")
 
-    result = df.groupby(['algorithm', 'dataset', 'language'])[list(args)].mean().reset_index()
+    # Group by specified columns and calculate the mean for the given columns
+    result = df.groupby(['algorithm', 'dataset', 'language', 'phase'])[columns].mean().reset_index()
 
     return result
 
 
-def median_unique_triplets(df: pd.DataFrame, *args: str):
-    missing_columns = [col for col in args if col not in df.columns]
+def median_unique_quadruplets(df: pd.DataFrame, columns: list[str]):
+    missing_columns = [col for col in columns if col not in df.columns]
     if missing_columns:
         raise ValueError(f"Columns not found in DataFrame: {', '.join(missing_columns)}")
 
-    result = df.groupby(['algorithm', 'dataset', 'language'])[list(args)].median().reset_index()
+    result = df.groupby(['algorithm', 'dataset', 'language', 'phase'])[list(columns)].median().reset_index()
 
     return result
 
@@ -134,33 +136,33 @@ def saveCsv(df: pd.DataFrame, name):
     df.to_csv(f"processedDatasets/{name}")
 
 
-def mean_group_by(df: pd.DataFrame, group_by: str, *args):
+def mean_group_by(df: pd.DataFrame, group_by: str, columns: list[str]):
     # Check if group_by is valid
     if group_by not in ['algorithm', 'dataset', 'language']:
         raise ValueError("group_by must be one of 'algorithm', 'dataset', or 'language'")
 
     # Check if args are valid feature names
-    for feature in args:
+    for feature in columns:
         if feature not in df.columns:
             raise ValueError(f"'{feature}' is not a valid column name in the DataFrame")
 
     # Group by the specified column and calculate the mean of specified features
-    result_df = df.groupby(group_by)[list(args)].mean().reset_index()
+    result_df = df.groupby([group_by, "phase"])[list(columns)].mean().reset_index()
 
     return result_df
 
 
-def median_group_by(df: pd.DataFrame, group_by: str, *args):
+def median_group_by(df: pd.DataFrame, group_by: str, columns: list[str]):
     # Check if group_by is valid
     if group_by not in ['algorithm', 'dataset', 'language']:
         raise ValueError("group_by must be one of 'algorithm', 'dataset', or 'language'")
 
     # Check if args are valid feature names
-    for feature in args:
+    for feature in columns:
         if feature not in df.columns:
             raise ValueError(f"'{feature}' is not a valid column name in the DataFrame")
 
     # Group by the specified column and calculate the mean of specified features
-    result_df = df.groupby(group_by)[list(args)].median().reset_index()
+    result_df = df.groupby([group_by, "phase"])[list(columns)].median().reset_index()
 
     return result_df

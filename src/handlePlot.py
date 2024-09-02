@@ -1,36 +1,11 @@
 import pandas as pd
-from utils import mean_unique_triplets, mean_group_by, saveCsv, plot, median_unique_triplets
+from utils import *
 
-df = pd.read_csv('processedDatasets/meanEmissions.csv')
 
-meanData = mean_unique_triplets(
-    df,
-    "duration",
-    "energy_consumed",
-    "emissions",
-    "emissions_rate",
-    "cpu_power",
-    "cpu_energy"
-)
+csvFileName = "meanEmissionNew.csv"
 
-output_csv_path = 'meanEmissions.csv'
-saveCsv(meanData, output_csv_path)
 
-print("Dataset con le medie delle triplette uniche:")
-print(meanData)
-
-group_by_algorithm = mean_group_by(meanData, "algorithm", "duration", "energy_consumed")
-group_by_dataset = mean_group_by(meanData, "dataset", "duration", "energy_consumed")
-group_by_language = mean_group_by(meanData, "language", "duration", "energy_consumed")
-
-print("\nMedia raggruppata per 'dataset':")
-print(group_by_dataset)
-
-print("\nMedia raggruppata per 'language':")
-print(group_by_language)
-
-print("\nMedia raggruppata per 'algorithm':")
-print(group_by_algorithm)
+df = pd.read_csv(f'processedDatasets/{csvFileName}')
 
 # Specifica i percorsi di salvataggio per i grafici
 graphics_folder = 'graphics/'
@@ -63,12 +38,4 @@ plot(group_by_dataset, x_axis='dataset', y_axis='energy_consumed', plotType="bar
 plot(group_by_algorithm, x_axis='algorithm', y_axis='duration', plotType="barPlot",
      save_path=graphics_paths["algorithm_duration"])
 
-medianData = median_unique_triplets(df, "duration", "energy_consumed")
 
-group_by_algorithm = mean_group_by(medianData, "algorithm", "duration", "energy_consumed")
-group_by_dataset = mean_group_by(medianData, "dataset", "duration", "energy_consumed")
-group_by_language = mean_group_by(medianData, "language", "duration", "energy_consumed")
-
-plot(group_by_language, "language", "duration")
-plot(group_by_dataset, "dataset", "energy_consumed")
-plot(group_by_algorithm, "algorithm", "duration")
