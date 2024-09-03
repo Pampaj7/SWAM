@@ -2,7 +2,7 @@ import matlab.engine
 import pandas as pd
 import os
 
-epochs = 2
+epochs = 10
 
 # Percorso della cartella contenente i file da eliminare
 directory_path = 'matlab/models'

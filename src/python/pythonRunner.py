@@ -11,7 +11,7 @@ from codecarbon import EmissionsTracker
 from sklearn.naive_bayes import GaussianNB
 import os
 
-epochs = 2
+epochs = 10
 
 # Percorso del file
 file_path = ['python/train_emissions_detailed.csv', "python/test_emissions_detailed.csv",
