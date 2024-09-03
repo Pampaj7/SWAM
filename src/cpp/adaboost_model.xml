@@ -4,7 +4,7 @@
 		<cereal_class_version>1</cereal_class_version>
 		<numClasses>100</numClasses>
 		<tolerance>9.9999999999999995e-07</tolerance>
-		<maxIterations>2</maxIterations>
+		<maxIterations>8</maxIterations>
 		<alpha size="dynamic">
 			<value0>17.12594695994455</value0>
 		</alpha>
