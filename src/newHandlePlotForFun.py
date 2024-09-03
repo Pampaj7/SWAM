@@ -242,6 +242,62 @@ def plot_emissions_rate(df, algorithm_col='algorithm', dataset_col='dataset', ph
     plt.show()
 
 
+def plot_time_series_for_algorithms(df, language, date_col, value_col):
+    # Filter the DataFrame for the specified language
+    df_filtered = df[df['language'] == language]
+
+    # Check if filtering resulted in non-empty DataFrame
+    if df_filtered.empty:
+        print(f"No data available for language: {language}")
+        return
+
+    # Convert the timestamp column to datetime
+    df_filtered[date_col] = pd.to_datetime(df_filtered[date_col], errors='coerce')
+
+    # Check for any conversion errors or NaT values
+    if df_filtered[date_col].isna().any():
+        print("There are invalid dates in the timestamp column.")
+
+    # Drop rows with invalid dates
+    df_filtered = df_filtered.dropna(subset=[date_col])
+
+    # Ensure the value column contains numeric data
+    df_filtered[value_col] = pd.to_numeric(df_filtered[value_col], errors='coerce')
+
+    # Drop rows with invalid or missing values in the value column
+    df_filtered = df_filtered.dropna(subset=[value_col])
+
+    # Check if there's still data to plot
+    if df_filtered.empty:
+        print("No valid data available for plotting.")
+        return
+
+    # Get unique algorithms
+    algorithms = df_filtered['algorithm'].unique()
+
+    for algorithm in algorithms:
+        plt.figure(figsize=(14, 8))
+
+        df_algo = df_filtered[df_filtered['algorithm'] == algorithm]
+
+        # Plot each run
+        for run_id in df_algo['run_id'].unique():
+            df_run = df_algo[df_algo['run_id'] == run_id]
+            plt.plot(df_run[date_col], df_run[value_col], marker='o', linestyle='-', label=f'Run {run_id}')
+
+        plt.title(f'Emissions Over Time for {algorithm} in {language}')
+        plt.xlabel('Date')
+        plt.ylabel('Emissions (kg CO2)')
+        plt.grid(True)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        # Save the plot as an image file
+        plt.savefig(f'graphics/{algorithm}_emissions_time_series_{language}.png')
+
+        # Show the plot
+        plt.show()
+
 df = load_dataset('processedDatasets/meanEmissionsNew.csv')
 df_raw = load_dataset('raw_merged_emissions.csv')
 df_clean = remove_outliers(df)
@@ -288,6 +344,13 @@ benchmark_by_language(df_clean,
                       metrics=['duration', 'energy_consumed', 'emissions', 'cpu_energy', 'emissions_rate', 'cpu_power'])
 
 plot_emissions_by_algorithm(df, 'algorithm', 'emissions')
-"""
+
 
 plot_emissions_rate(df)
+"""
+plot_time_series_for_algorithms(
+    df_raw,
+    language='matlab',  # Replace with the language you want to filter by
+    date_col='timestamp',
+    value_col='emissions'
+)
