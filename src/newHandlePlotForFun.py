@@ -229,10 +229,23 @@ def plot_emissions_by_algorithm(df, algorithm_col, emissions_col, title="Emissio
     plt.show()
 
 
+def plot_emissions_rate(df, algorithm_col='algorithm', dataset_col='dataset', phase_col='phase',
+                        emissions_rate_col='emissions_rate'):
+    plt.figure(figsize=(14, 8))
+    sns.barplot(data=df, x=algorithm_col, y=emissions_rate_col, hue=phase_col, palette='Set2')
+    plt.title("Emissions Rate by Algorithm and Phase")
+    plt.xlabel("Algorithm")
+    plt.ylabel("Emissions Rate (kg CO2/sec)")
+    plt.legend(title="Phase")
+    plt.xticks(rotation=45)
+    plt.savefig("graphics/Emissions_Rate_by_Algorithm_and_Phase")
+    plt.show()
+
+
 df = load_dataset('processedDatasets/meanEmissionsNew.csv')
 df_raw = load_dataset('raw_merged_emissions.csv')
 df_clean = remove_outliers(df)
-
+"""
 # u can exclude a language by choice
 plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'duration', 'phase', 'test',
                                               title="Execution_Time_Distribution_by_Language_and_Algorithm_(Test)",
@@ -275,3 +288,6 @@ benchmark_by_language(df_clean,
                       metrics=['duration', 'energy_consumed', 'emissions', 'cpu_energy', 'emissions_rate', 'cpu_power'])
 
 plot_emissions_by_algorithm(df, 'algorithm', 'emissions')
+"""
+
+plot_emissions_rate(df)
