@@ -8,6 +8,9 @@ import weka.classifiers.Evaluation;
 
 public class knn {
 
+  public static long startTime;
+  public static long endTime;
+  public static double elapsedTime;
   private static final String MODEL_FILE = "knnModel.model";
   private static IBk knn;
   private static PythonHandler pythonHandler = new PythonHandler();
@@ -21,8 +24,13 @@ public class knn {
     knn = new IBk();
     knn.setKNN(3); // Set k to 3 for example
     pythonHandler.startTracker("emissions.csv");
+    startTime = System.currentTimeMillis();
     knn.buildClassifier(data);
+    endTime = System.currentTimeMillis();
+    elapsedTime = (endTime - startTime) / 1000.0;
+    System.out.println("k-NN Training Time: " + elapsedTime + " seconds");
     pythonHandler.stopTracker();
+    loader.editCsv(elapsedTime);
 
     // Save the model to a file
     SerializationHelper.write(MODEL_FILE, knn);
@@ -45,7 +53,13 @@ public class knn {
     data.setClassIndex(targetIndex);
 
     // Evaluate the model using Weka's Evaluation class
+    pythonHandler.startTracker("emissions.csv");
+    startTime = System.currentTimeMillis();
     Evaluation evaluation = evaluateModel(knn, data);
+    endTime = System.currentTimeMillis();
+    pythonHandler.stopTracker();
+    elapsedTime = (endTime - startTime) / 1000.0;
+    loader.editCsv(elapsedTime);
     System.out.println("k-NN Test Accuracy: " + evaluation.pctCorrect());
   }
 
@@ -58,9 +72,9 @@ public class knn {
 
     // Initialize Evaluation object
     Evaluation evaluation = new Evaluation(trainData);
-    pythonHandler.startTracker("emissions.csv");
+    // pythonHandler.startTracker("emissions.csv");
     evaluation.evaluateModel(model, testData);
-    pythonHandler.stopTracker();
+    // pythonHandler.stopTracker();
 
     return evaluation;
   }

@@ -1,5 +1,6 @@
 package com.example;
 
+import scala.language;
 import weka.classifiers.Classifier;
 import weka.classifiers.meta.AdaBoostM1;
 import weka.core.Instances;
@@ -10,7 +11,9 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 public class adaboost {
-
+  public static long startTime;
+  public static long endTime;
+  public static double elapsedTime;
   private static final String MODEL_FILE = "adaboostModel.model";
   private static AdaBoostM1 adaboost;
   private static PythonHandler pythonHandler = new PythonHandler();
@@ -40,8 +43,12 @@ public class adaboost {
     adaboost = new AdaBoostM1();
     adaboost.setClassifier(new weka.classifiers.functions.SMO()); // Use SMO as the base classifier
     pythonHandler.startTracker("emissions.csv");
+    startTime = System.currentTimeMillis();
     adaboost.buildClassifier(data);
+    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
+    elapsedTime = (endTime - startTime) / 1000.0;
+    loader.editCsv(elapsedTime);
 
     // Save the model to a file
     SerializationHelper.write(MODEL_FILE, adaboost);
@@ -78,8 +85,12 @@ public class adaboost {
     // Initialize Evaluation object
     Evaluation evaluation = new Evaluation(trainData);
     pythonHandler.startTracker("emissions.csv");
+    startTime = System.currentTimeMillis();
     evaluation.evaluateModel(model, testData);
+    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
+    elapsedTime = (endTime - startTime) / 1000.0;
+    loader.editCsv(elapsedTime);
 
     return evaluation;
   }

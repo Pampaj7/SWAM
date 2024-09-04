@@ -8,7 +8,9 @@ import weka.filters.unsupervised.attribute.NumericToNominal;
 import weka.core.SerializationHelper;
 
 public class logreg {
-
+  public static long startTime;
+  public static long endTime;
+  public static double elapsedTime;
   private static final String MODEL_FILE = "logisticModel.model";
   private static Logistic logistic;
   private static PythonHandler pythonHandler = new PythonHandler();
@@ -38,11 +40,14 @@ public class logreg {
       logistic = new Logistic();
 
       pythonHandler.startTracker("emissions.csv");
+      startTime = System.currentTimeMillis();
       logistic.buildClassifier(data);
+      endTime = System.currentTimeMillis();
 
       // Stop the tracker
       pythonHandler.stopTracker();
-
+      elapsedTime = (endTime - startTime) / 1000.0;
+      loader.editCsv(elapsedTime);
       // Save the model to a file
       SerializationHelper.write(MODEL_FILE, logistic);
       System.out.println("Model saved to " + MODEL_FILE);
@@ -67,8 +72,12 @@ public class logreg {
     data = convertClassToNominal(data, targetLabelName);
 
     pythonHandler.startTracker("emissions.csv");
+    startTime = System.currentTimeMillis();
     double accuracy = evaluateModel(logistic, data);
+    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
+    elapsedTime = (endTime - startTime) / 1000.0;
+    loader.editCsv(elapsedTime);
     System.out.println("Logistic Regression Test Accuracy: " + accuracy);
   }
 

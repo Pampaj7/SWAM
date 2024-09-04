@@ -11,6 +11,9 @@ import weka.classifiers.Evaluation;
 import java.util.Random;
 
 public class svc {
+  public static long startTime;
+  public static long endTime;
+  public static double elapsedTime;
 
   private static final String MODEL_FILE = "svcModel.model";
   private static SMO smo;
@@ -40,9 +43,12 @@ public class svc {
     // Create and configure the SVC (SMO) model
     smo = new SMO();
     pythonHandler.startTracker("emissions.csv");
+    startTime = System.currentTimeMillis();
     smo.buildClassifier(data);
+    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
-
+    elapsedTime = (endTime - startTime) / 1000.0;
+    loader.editCsv(elapsedTime);
     // Save the model to a file
     SerializationHelper.write(MODEL_FILE, smo);
     System.out.println("Model saved to " + MODEL_FILE);
@@ -79,9 +85,12 @@ public class svc {
     // Initialize Evaluation object
     Evaluation evaluation = new Evaluation(trainData);
     pythonHandler.startTracker("emissions.csv");
+    startTime = System.currentTimeMillis();
     evaluation.evaluateModel(model, testData);
+    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
-
+    elapsedTime = (endTime - startTime) / 1000.0;
+    loader.editCsv(elapsedTime);
     return evaluation;
   }
 }
