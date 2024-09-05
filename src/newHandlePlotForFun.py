@@ -298,10 +298,11 @@ def plot_time_series_for_algorithms(df, language, date_col, value_col):
         # Show the plot
         plt.show()
 
+
 df = load_dataset('processedDatasets/meanEmissionsNew.csv')
 df_raw = load_dataset('raw_merged_emissions.csv')
 df_clean = remove_outliers(df)
-"""
+
 # u can exclude a language by choice
 plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'duration', 'phase', 'test',
                                               title="Execution_Time_Distribution_by_Language_and_Algorithm_(Test)",
@@ -345,9 +346,8 @@ benchmark_by_language(df_clean,
 
 plot_emissions_by_algorithm(df, 'algorithm', 'emissions')
 
-
 plot_emissions_rate(df)
-"""
+
 plot_time_series_for_algorithms(
     df_raw,
     language='matlab',  # Replace with the language you want to filter by

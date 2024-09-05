@@ -14,7 +14,7 @@ library(adabag)
 
 
 set.seed(42)
-use_python("/Users/pippodima/venvPy3.11/bin/python", required = TRUE)
+use_python("/Users/pampaj/anaconda3/envs/sw/bin/python", required = TRUE)
 source_python("matlab/tracker_control.py")
 
 dataIris <- read.csv("../datasets/iris/iris.csv")

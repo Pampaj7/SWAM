@@ -18,7 +18,7 @@ def mainR():
         "adaBoost",
         "naiveBayes"
     ]
-    repetition = 1
+    repetition = 10
     savePath = "R/csv"
     language = "R"
 

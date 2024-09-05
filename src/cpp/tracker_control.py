@@ -13,7 +13,7 @@ class Tracker:
         tracker.start()
         print("Tracker started.")
 
-    def stop_tracker():
+    def stop_tracker(self):
         global tracker
         if tracker is not None:
             emissions = tracker.stop()

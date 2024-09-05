@@ -6,7 +6,7 @@ import os
 
 def processCsv():
     # Percorso della cartella contenente i file CSV
-    directory_path = "output/"
+    directory_path = "java/output/"
 
     # Verifica se la cartella esiste
     if not os.path.exists(directory_path):
@@ -127,7 +127,7 @@ def main():
         "adaBoost",
         "naiveBayes",
     ]
-    repetition = 1
+    repetition = 10
     new_data = []
     new_csv_filename = (
         "emissions_detailed.csv"  # Choose an appropriate name for the new file
@@ -136,7 +136,6 @@ def main():
     for dataset in datasets:
         for algorithm in algorithms:
             for _ in range(repetition):
-
                 # TODO: overwrite emission.csv or delete every time
 
                 print("Executing java script:")
@@ -146,18 +145,18 @@ def main():
                 run_java_program(dataset, algorithm, "true")
 
                 os.rename(
-                    "./output/emissions.csv",
-                    f"./output/{algorithm}_{dataset}_train_emissions.csv",
+                    "/Users/pampaj/PycharmProjects/SWAM/src/java/output/emissions.csv",
+                    f"/Users/pampaj/PycharmProjects/SWAM/src/java/output/{algorithm}_{dataset}_train_emissions.csv",
                 )
 
-                run_java_program(dataset, algorithm, "true")
+                run_java_program(dataset, algorithm, "false")
 
                 os.rename(
-                    "./output/emissions.csv",
-                    f"./output/{algorithm}_{dataset}_test_emissions.csv",
+                    "/Users/pampaj/PycharmProjects/SWAM/src/java/output/emissions.csv",
+                    f"/Users/pampaj/PycharmProjects/SWAM/src/java/output/{algorithm}_{dataset}_test_emissions.csv",
                 )
     processCsv()
-    mergeCsvFiles("output/", "emissions_detailed.csv")
+    mergeCsvFiles("java/output/", "emissions_detailed.csv")
 
     # Print the result
 

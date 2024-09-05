@@ -6,7 +6,7 @@ import os
 
 def processCsv():
     # Percorso della cartella contenente i file CSV
-    directory_path = "output/"
+    directory_path = "/Users/pampaj/PycharmProjects/SWAM/src/cpp/output"
 
     # Verifica se la cartella esiste
     if not os.path.exists(directory_path):
