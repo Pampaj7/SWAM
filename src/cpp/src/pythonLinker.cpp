@@ -14,8 +14,7 @@ void add_to_sys_path_py(const char *path) {
 void CallPython(const char *module_name, const char *class_name,
                 const char *func_name, PyObject *args) {
   add_to_sys_path_py(".");
-  add_to_sys_path_py("/Users/niccolomarini/Documents/GitHub/SWAM/.venv/lib/"
-                     "python3.12/site-packages");
+  add_to_sys_path_py("/Users/pampaj/anaconda3/envs/cpp/lib/python3.12/site-packages/");
   // Import the Python module
   PyObject *pName = PyUnicode_DecodeFSDefault(module_name);
   PyObject *pModule = PyImport_Import(pName);

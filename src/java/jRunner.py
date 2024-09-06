@@ -115,12 +115,11 @@ def run_java_program(dataset, algorithm, train):
 
 
 def check_exist(emissions_file):
-
     # Check if the file already exists
     if os.path.exists(emissions_file):
         # Open both the original emissions.csv and the target file
-        with open("./output/emissions.csv", "r") as src, open(
-            emissions_file, "a"
+        with open("/Users/pampaj/PycharmProjects/SWAM/src/java/output/emissions.csv", "r") as src, open(
+                emissions_file, "a"
         ) as dest:
             # Read the header from the source file
             src_lines = src.readlines()
@@ -130,26 +129,26 @@ def check_exist(emissions_file):
             # Write the data without the header
             dest.writelines(src_lines[1:])
         # Optionally, remove the source emissions.csv if no longer needed
-        os.remove("./output/emissions.csv")
+        os.remove("/Users/pampaj/PycharmProjects/SWAM/src/java/output/emissions.csv")
     else:
         # If the file does not exist, rename emissions.csv
-        os.rename("./output/emissions.csv", emissions_file)
+        os.rename("/Users/pampaj/PycharmProjects/SWAM/src/java/output/emissions.csv", emissions_file)
 
 
 def main():
     datasets = ["breastCancer", "wine", "iris"]
     algorithms = [
+        "randomForest",
         "logisticRegression",
         # "XGBoost",
         "decisionTree",
-        "randomForest",
         "KNN",
         "SVC",
         # "GMM",
         "adaBoost",
         "naiveBayes",
     ]
-    repetition = 10
+    repetition = 2
     new_data = []
     new_csv_filename = (
         "emissions_detailed.csv"  # Choose an appropriate name for the new file
@@ -165,13 +164,13 @@ def main():
 
                 # Run the model and capture the result
                 run_java_program(dataset, algorithm, "true")
-                check_exist(f"java/output/{algorithm}_{dataset}_train_emissions.csv")
+                check_exist(f"/Users/pampaj/PycharmProjects/SWAM/src/java/output/{algorithm}_{dataset}_train_emissions.csv")
 
                 run_java_program(dataset, algorithm, "false")
-                check_exist(f"java/output/{algorithm}_{dataset}_test_emissions.csv")
+                check_exist(f"/Users/pampaj/PycharmProjects/SWAM/src/java/output/{algorithm}_{dataset}_test_emissions.csv")
 
     processCsv()
-    mergeCsvFiles("java/output/", "emissions_detailed.csv")
+    mergeCsvFiles("/Users/pampaj/PycharmProjects/SWAM/src/java/output/", "emissions_detailed.csv")
 
     # Print the result
 

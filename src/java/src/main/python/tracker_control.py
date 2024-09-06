@@ -9,7 +9,7 @@ logging.basicConfig(
 )
 
 tracker = None
-output_dir = os.path.abspath("output")  # Use absolute path for output directory
+output_dir = os.path.abspath("/Users/pampaj/PycharmProjects/SWAM/src/java/output")  # Use absolute path for output directory
 
 
 def start_tracker(output_file):

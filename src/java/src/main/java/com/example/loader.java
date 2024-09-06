@@ -53,7 +53,7 @@ public class loader {
 
   public static void editCsv(double time) {
     try {
-      Reader reader = new FileReader("./output/emissions.csv");
+      Reader reader = new FileReader("/emissions.csv");
       CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
       Writer writer = new FileWriter("./output/emissions.csv");
       CSVPrinter csvPrinter = new CSVPrinter(writer,

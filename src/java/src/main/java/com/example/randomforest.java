@@ -130,7 +130,7 @@ public class randomforest {
 
       // Evaluate the model on the testing data
       Evaluation evaluation = new Evaluation(split[0]);
-      pythonHandler.startTracker("emissions");
+      pythonHandler.startTracker("emissions.csv");
       evaluation.evaluateModel(forest, testData);
       pythonHandler.stopTracker();
 
