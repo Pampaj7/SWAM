@@ -42,12 +42,8 @@ public class naivebayes {
     // Create and configure the NaiveBayes model
     naiveBayes = new NaiveBayes();
     pythonHandler.startTracker("emissions.csv");
-    startTime = System.currentTimeMillis();
     naiveBayes.buildClassifier(data);
-    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
-    elapsedTime = (endTime - startTime) / 1000.0;
-    loader.editCsv(elapsedTime);
     // Save the model to a file
     SerializationHelper.write(MODEL_FILE, naiveBayes);
     System.out.println("Model saved to " + MODEL_FILE);
@@ -83,12 +79,8 @@ public class naivebayes {
     // Initialize Evaluation object
     Evaluation evaluation = new Evaluation(trainData);
     pythonHandler.startTracker("emissions.csv");
-    startTime = System.currentTimeMillis();
     evaluation.evaluateModel(model, testData);
-    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
-    elapsedTime = (endTime - startTime) / 1000.0;
-    loader.editCsv(elapsedTime);
 
     // Print detailed evaluation results
 

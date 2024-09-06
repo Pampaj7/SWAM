@@ -55,12 +55,8 @@ public class decisiontree {
       // Create and train the decision tree (J48) classifier
       classifier = new J48(); // J48 is the Weka implementation of C4.5
       pythonHandler.startTracker("emissions.csv");
-      startTime = System.currentTimeMillis();
       classifier.buildClassifier(train);
-      endTime = System.currentTimeMillis();
       pythonHandler.stopTracker();
-      elapsedTime = (endTime - startTime) / 1000.0;
-      loader.editCsv(elapsedTime);
       SerializationHelper.write(MODEL_FILE, classifier);
       System.out.println("Model saved to " + MODEL_FILE);
 
@@ -104,12 +100,8 @@ public class decisiontree {
       // Evaluate the classifier on the test set
       Evaluation evaluation = new Evaluation(split[0]); // Pass training set for evaluation context
       pythonHandler.startTracker("emissions.csv");
-      startTime = System.currentTimeMillis();
       evaluation.evaluateModel(classifier, test);
-      endTime = System.currentTimeMillis();
       pythonHandler.stopTracker();
-      elapsedTime = (endTime - startTime) / 1000.0;
-      loader.editCsv(elapsedTime);
 
       // Output the accuracy
       System.out.println("DT Accuracy: " + evaluation.pctCorrect() + "%");

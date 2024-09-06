@@ -24,13 +24,9 @@ public class knn {
     knn = new IBk();
     knn.setKNN(3); // Set k to 3 for example
     pythonHandler.startTracker("emissions.csv");
-    startTime = System.currentTimeMillis();
     knn.buildClassifier(data);
-    endTime = System.currentTimeMillis();
-    elapsedTime = (endTime - startTime) / 1000.0;
-    System.out.println("k-NN Training Time: " + elapsedTime + " seconds");
     pythonHandler.stopTracker();
-    loader.editCsv(elapsedTime);
+    // loader.editCsv(elapsedTime);
 
     // Save the model to a file
     SerializationHelper.write(MODEL_FILE, knn);
@@ -54,13 +50,9 @@ public class knn {
 
     // Evaluate the model using Weka's Evaluation class
     pythonHandler.startTracker("emissions.csv");
-    startTime = System.currentTimeMillis();
     Evaluation evaluation = evaluateModel(knn, data);
-    endTime = System.currentTimeMillis();
     pythonHandler.stopTracker();
-    elapsedTime = (endTime - startTime) / 1000.0;
-    loader.editCsv(elapsedTime);
-    System.out.println("k-NN Test Accuracy: " + evaluation.pctCorrect());
+    // loader.editCsv(elapsedTime);
   }
 
   private static Evaluation evaluateModel(IBk model, Instances data) throws Exception {

@@ -114,6 +114,28 @@ def run_java_program(dataset, algorithm, train):
         print(e.stderr)
 
 
+def check_exist(emissions_file):
+
+    # Check if the file already exists
+    if os.path.exists(emissions_file):
+        # Open both the original emissions.csv and the target file
+        with open("./output/emissions.csv", "r") as src, open(
+            emissions_file, "a"
+        ) as dest:
+            # Read the header from the source file
+            src_lines = src.readlines()
+            # If the target file is empty, include the header
+            if os.path.getsize(emissions_file) == 0:
+                dest.write(src_lines[0])  # Write the header
+            # Write the data without the header
+            dest.writelines(src_lines[1:])
+        # Optionally, remove the source emissions.csv if no longer needed
+        os.remove("./output/emissions.csv")
+    else:
+        # If the file does not exist, rename emissions.csv
+        os.rename("./output/emissions.csv", emissions_file)
+
+
 def main():
     datasets = ["breastCancer", "wine", "iris"]
     algorithms = [
@@ -143,18 +165,11 @@ def main():
 
                 # Run the model and capture the result
                 run_java_program(dataset, algorithm, "true")
-
-                os.rename(
-                    "/Users/pampaj/PycharmProjects/SWAM/src/java/output/emissions.csv",
-                    f"/Users/pampaj/PycharmProjects/SWAM/src/java/output/{algorithm}_{dataset}_train_emissions.csv",
-                )
+                check_exist(f"java/output/{algorithm}_{dataset}_train_emissions.csv")
 
                 run_java_program(dataset, algorithm, "false")
+                check_exist(f"java/output/{algorithm}_{dataset}_test_emissions.csv")
 
-                os.rename(
-                    "/Users/pampaj/PycharmProjects/SWAM/src/java/output/emissions.csv",
-                    f"/Users/pampaj/PycharmProjects/SWAM/src/java/output/{algorithm}_{dataset}_test_emissions.csv",
-                )
     processCsv()
     mergeCsvFiles("java/output/", "emissions_detailed.csv")
 
