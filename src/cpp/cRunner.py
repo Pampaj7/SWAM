@@ -36,7 +36,7 @@ def run_cpp_program(dataset, algorithm, test):
 
 def processCsv():
     # Percorso della cartella contenente i file CSV
-    directory_path = "./output"
+    directory_path = "/Users/pampaj/PycharmProjects/SWAM/src/cpp/output"
 
     # Verifica se la cartella esiste
     if not os.path.exists(directory_path):
@@ -112,7 +112,7 @@ def check_exist(emissions_file):
     # Check if the file already exists
     if os.path.exists(emissions_file):
         # Open both the original emissions.csv and the target file
-        with open("./output/emissions.csv", "r") as src, open(
+        with open("/Users/pampaj/PycharmProjects/SWAM/src/cpp/output/emissions.csv", "r") as src, open(
             emissions_file, "a"
         ) as dest:
             # Read the header from the source file
@@ -123,10 +123,10 @@ def check_exist(emissions_file):
             # Write the data without the header
             dest.writelines(src_lines[1:])
         # Optionally, remove the source emissions.csv if no longer needed
-        os.remove("./output/emissions.csv")
+        os.remove("/Users/pampaj/PycharmProjects/SWAM/src/cpp/output/emissions.csv")
     else:
         # If the file does not exist, rename emissions.csv
-        os.rename("./output/emissions.csv", emissions_file)
+        os.rename("/Users/pampaj/PycharmProjects/SWAM/src/cpp/output/emissions.csv", emissions_file)
 
 
 def main():
@@ -142,7 +142,7 @@ def main():
         "adaBoost",
         "naiveBayes",
     ]
-    repetition = 10
+    repetition = 30
     new_data = []
     new_csv_filename = (
         "emissions_detailed.csv"  # Choose an appropriate name for the new file
@@ -158,7 +158,7 @@ def main():
                 print(f"with {dataset} , {algorithm}")
                 # Run the model and capture the result
                 run_cpp_program(dataset, algorithm, "false")
-                check_exist(f"./output/{algorithm}_{dataset}_train_emissions.csv")
+                check_exist(f"/Users/pampaj/PycharmProjects/SWAM/src/cpp/output/{algorithm}_{dataset}_train_emissions.csv")
 
                 print("Executing Cpp test:")
                 print(f"with {dataset} , {algorithm}")
@@ -166,9 +166,9 @@ def main():
                 run_cpp_program(dataset, algorithm, "true")
 
                 # Print the result
-                check_exist(f"./output/{algorithm}_{dataset}_test_emissions.csv")
+                check_exist(f"/Users/pampaj/PycharmProjects/SWAM/src/cpp/output/{algorithm}_{dataset}_test_emissions.csv")
     processCsv()
-    mergeCsvFiles("output/", "./emissions_detailed.csv")
+    mergeCsvFiles("/Users/pampaj/PycharmProjects/SWAM/src/cpp/output/", "./emissions_detailed.csv")
 
 
 # main

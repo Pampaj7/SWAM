@@ -42,16 +42,18 @@ void TrainLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
   mlpack::data::StandardScaler scaler;
 
   // Call start_tracker
-  CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
-  Py_DECREF(pArgsStart);
 
   scaler.Fit(trainX);
 
-  CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
   scaler.Transform(trainX, trainX);
 
   // Train the logistic regression model
+  CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
   mlpack::LogisticRegression<> logreg(trainX, trainY);
+  CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
+
+
+  Py_DECREF(pArgsStart);
 
   // Save the model
   mlpack::data::Save("./logistic_regression_model.bin", "logreg_model", logreg);

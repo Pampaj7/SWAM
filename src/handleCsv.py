@@ -1,6 +1,6 @@
 import pandas as pd
-from utils import mean_unique_quadruplets, mean_group_by, saveCsv, plot, median_unique_quadruplets, retrive_data, median_group_by
-
+from utils import mean_unique_quadruplets, mean_group_by, saveCsv, plot, median_unique_quadruplets, retrive_data, \
+    median_group_by
 
 output_csv_name = 'meanEmissionsNew.csv'
 columns = ["duration", "energy_consumed", "emissions", "emissions_rate", "cpu_power", "cpu_energy"]
@@ -27,8 +27,6 @@ print(group_by_language)
 
 print("\nMedia raggruppata per 'algorithm':")
 print(group_by_algorithm)
-
-
 
 medianData = median_unique_quadruplets(df, columns)
 

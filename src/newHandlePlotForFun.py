@@ -305,12 +305,10 @@ df_clean = remove_outliers(df)
 
 # u can exclude a language by choice
 plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'duration', 'phase', 'test',
-                                              title="Execution_Time_Distribution_by_Language_and_Algorithm_(Test)",
-                                              excluded_language="java")
+                                              title="Execution_Time_Distribution_by_Language_and_Algorithm_(Test)", excluded_language='None')
 
 plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'duration', 'phase', 'train',
-                                              title="Execution_Time_Distribution_by_Language_and_Algorithm_(Train)",
-                                              excluded_language="java")
+                                              title="Execution_Time_Distribution_by_Language_and_Algorithm_(Train)", excluded_language='None')
 
 plot_co2_distribution_by_language(df, 'language', 'emissions')
 

@@ -6,7 +6,7 @@ import os
 
 def processCsv():
     # Percorso della cartella contenente i file CSV
-    directory_path = "java/output/"
+    directory_path = "/Users/pampaj/PycharmProjects/SWAM/src/java/output"
 
     # Verifica se la cartella esiste
     if not os.path.exists(directory_path):
@@ -148,7 +148,7 @@ def main():
         "adaBoost",
         "naiveBayes",
     ]
-    repetition = 2
+    repetition = 30
     new_data = []
     new_csv_filename = (
         "emissions_detailed.csv"  # Choose an appropriate name for the new file
