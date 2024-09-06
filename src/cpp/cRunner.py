@@ -4,9 +4,39 @@ import pandas as pd
 import os
 
 
+def compile_cpp():
+    try:
+        # Compila il codice C++
+        subprocess.run(["make"], check=True)
+        print("Compilazione completata con successo.")
+    except subprocess.CalledProcessError as e:
+        print("Errore durante la compilazione:")
+        print(e)
+        print("Output di errore:")
+        print(e.stderr)
+
+
+def run_cpp_program(dataset, algorithm, test):
+    try:
+        # Esegui l'eseguibile compilato
+        result = subprocess.run(
+            ["./src/cRunner", dataset, algorithm, test],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        print("Output del programma C++:")
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Errore durante l'esecuzione del programma C++:")
+        print(e)
+        print("Output di errore:")
+        print(e.stderr)
+
+
 def processCsv():
     # Percorso della cartella contenente i file CSV
-    directory_path = "/Users/pampaj/PycharmProjects/SWAM/src/cpp/output"
+    directory_path = "./output"
 
     # Verifica se la cartella esiste
     if not os.path.exists(directory_path):
@@ -77,34 +107,26 @@ def mergeCsvFiles(directory_path, merged_file_path):
     print(f"File CSV uniti e salvati in {merged_file_path}")
 
 
-def compile_cpp():
-    try:
-        # Compila il codice C++
-        subprocess.run(["make"], check=True)
-        print("Compilazione completata con successo.")
-    except subprocess.CalledProcessError as e:
-        print("Errore durante la compilazione:")
-        print(e)
-        print("Output di errore:")
-        print(e.stderr)
+def check_exist(emissions_file):
 
-
-def run_cpp_program(dataset, algorithm, test):
-    try:
-        # Esegui l'eseguibile compilato
-        result = subprocess.run(
-            ["./src/cRunner", dataset, algorithm, test],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        print("Output del programma C++:")
-        print(result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("Errore durante l'esecuzione del programma C++:")
-        print(e)
-        print("Output di errore:")
-        print(e.stderr)
+    # Check if the file already exists
+    if os.path.exists(emissions_file):
+        # Open both the original emissions.csv and the target file
+        with open("./output/emissions.csv", "r") as src, open(
+            emissions_file, "a"
+        ) as dest:
+            # Read the header from the source file
+            src_lines = src.readlines()
+            # If the target file is empty, include the header
+            if os.path.getsize(emissions_file) == 0:
+                dest.write(src_lines[0])  # Write the header
+            # Write the data without the header
+            dest.writelines(src_lines[1:])
+        # Optionally, remove the source emissions.csv if no longer needed
+        os.remove("./output/emissions.csv")
+    else:
+        # If the file does not exist, rename emissions.csv
+        os.rename("./output/emissions.csv", emissions_file)
 
 
 def main():
@@ -120,7 +142,7 @@ def main():
         "adaBoost",
         "naiveBayes",
     ]
-    repetition = 1
+    repetition = 10
     new_data = []
     new_csv_filename = (
         "emissions_detailed.csv"  # Choose an appropriate name for the new file
@@ -136,11 +158,7 @@ def main():
                 print(f"with {dataset} , {algorithm}")
                 # Run the model and capture the result
                 run_cpp_program(dataset, algorithm, "false")
-
-                os.rename(
-                    "./output/emissions.csv",
-                    f"./output/{algorithm}_{dataset}_train_emissions.csv",
-                )
+                check_exist(f"./output/{algorithm}_{dataset}_train_emissions.csv")
 
                 print("Executing Cpp test:")
                 print(f"with {dataset} , {algorithm}")
@@ -148,10 +166,7 @@ def main():
                 run_cpp_program(dataset, algorithm, "true")
 
                 # Print the result
-                os.rename(
-                    "./output/emissions.csv",
-                    f"./output/{algorithm}_{dataset}_test_emissions.csv",
-                )
+                check_exist(f"./output/{algorithm}_{dataset}_test_emissions.csv")
     processCsv()
     mergeCsvFiles("output/", "./emissions_detailed.csv")
 
