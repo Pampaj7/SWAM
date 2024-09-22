@@ -166,3 +166,58 @@ def median_group_by(df: pd.DataFrame, group_by: str, columns: list[str]):
     result_df = df.groupby([group_by, "phase"])[list(columns)].median().reset_index()
 
     return result_df
+
+
+def sum_metrics_per_algorithm(df):
+    # Verifica che il dataframe contenga le colonne richieste
+    required_columns = {'algorithm', 'phase', 'duration', 'energy_consumed', 'emissions', 'emissions_rate',
+                        'cpu_energy'}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(f"DataFrame deve contenere le colonne: {required_columns}")
+
+    # Filtra i dati per fase "train" e "test"
+    df_train = df[df['phase'] == 'train']
+    df_test = df[df['phase'] == 'test']
+
+    # Raggruppa i dati per algoritmo e calcola la somma per ciascuna metrica
+    sum_train = df_train.groupby('algorithm').sum().reset_index()
+    sum_test = df_test.groupby('algorithm').sum().reset_index()
+
+    # Unisci i risultati per fase di train e test
+    sum_train.rename(columns=lambda x: f'train_{x}', inplace=True)
+    sum_test.rename(columns=lambda x: f'test_{x}', inplace=True)
+
+    # Merge dei risultati su "algorithm"
+    result = pd.merge(sum_train, sum_test, left_on='train_algorithm', right_on='test_algorithm')
+
+    # Rimuovi colonne duplicate dopo il merge
+    result.drop(columns=['test_algorithm'], inplace=True)
+
+    return result
+
+
+def sum_metrics_per_language(df):
+    # Verifica che il dataframe contenga le colonne richieste
+    required_columns = {'algorithm', 'phase', 'duration', 'energy_consumed', 'emissions', 'emissions_rate',
+                        'cpu_energy'}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(f"DataFrame deve contenere le colonne: {required_columns}")
+
+    # Raggruppa per algoritmo e somma i valori delle metriche per ogni algoritmo
+    summed_df = df.groupby('algorithm').sum().reset_index()
+
+    return summed_df
+
+def sum_metrics_per_language_and_algorithm(df):
+    # Verifica che il dataframe contenga le colonne richieste
+    required_columns = {'language', 'algorithm', 'duration', 'energy_consumed', 'emissions', 'emissions_rate', 'cpu_energy'}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(f"DataFrame deve contenere le colonne: {required_columns}")
+
+    # Rimuovi le colonne 'dataset' e 'phase'
+    df = df.drop(columns=['dataset', 'phase'], errors='ignore')
+
+    # Raggruppa per linguaggio e algoritmo e somma i valori delle metriche per ogni combinazione
+    summed_df = df.groupby(['language', 'algorithm']).sum().reset_index()
+
+    return summed_df
