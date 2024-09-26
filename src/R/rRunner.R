@@ -139,6 +139,7 @@ train_logistic_regression <- function(data, target, savePath, fileName, train_sp
     if ("type" %in% colnames(data)){
         # Convert the target column to a binary factor
         data[["type"]] <- as.factor(ifelse(data[["type"]] == "red", 1, 0))
+        data[["type"]] <- as.factor(ifelse(data[["Quality"]] > 6, 1, 0))
     }
 
     # Ensure the target column is a factor
