@@ -1,18 +1,12 @@
 import subprocess
-from R.rRunner import mainR
-from R.rRunner import maintest
+from src.rRunner import main
+
+
 # import matlab.engine
-from codecarbon import EmissionsTracker
 
 
 def run_r_script():
-    # result = subprocess.run(
-    #     ["python", "R/rRunner.py"], capture_output=True, text=True
-    # )
-    # print("Python script output:")
-    # print(result.stdout)
-    # print(result.stderr)
-    mainR()
+    main()
 
 
 def run_python():
@@ -59,7 +53,7 @@ if __name__ == "__main__":
     run_r_script()
 
     # print("\nEsecuzione matlabRunner:")
-    run_matlab_script()
+    # run_matlab_script()
     #
     # print("\nEsecuzione programma Java:")
     #run_java_program()
@@ -67,4 +61,4 @@ if __name__ == "__main__":
     # print("\nEsecuzione programma C++:")
     #run_cpp_program()
     # print("\nEsecuzione script Python:")
-    run_python()
+    # run_python()

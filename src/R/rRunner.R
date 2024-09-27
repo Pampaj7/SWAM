@@ -14,12 +14,12 @@ library(adabag)
 
 
 set.seed(42)
-use_python("/Users/pampaj/anaconda3/envs/sw/bin/python", required = TRUE)
-source_python("matlab/tracker_control.py")
+use_python("/opt/homebrew/Caskroom/miniforge/base/envs/swam/bin/python", required = TRUE)
+source_python("../matlab/tracker_control.py")
 
-dataIris <- read.csv("../datasets/iris/iris.csv")
-dataBreastCancer <- read.csv("../datasets/breastcancer/breastcancer.csv")
-dataWine <- read.csv("../datasets/winequality/wine_data.csv")
+dataIris <- read.csv("../../datasets/iris/iris.csv")
+dataBreastCancer <- read.csv("../../datasets/breastcancer/breastcancer.csv")
+dataWine <- read.csv("../../datasets/winequality/wine_data.csv")
 
 
 
@@ -120,6 +120,7 @@ train_knn <- function(data, target, savePath, fileName, train_split = 0.8, k = 5
 
   # Train the k-NN model
 
+  print("inizio test knn")
   # Note: k-NN training is done during prediction in the class package
   start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
   predictions <- knn(train = trainX, test = testX, cl = trainY, k = k)
@@ -136,10 +137,10 @@ train_knn <- function(data, target, savePath, fileName, train_split = 0.8, k = 5
   return(if (is.factor(data[[target]])) confMatrix else rmse)
 }
 train_logistic_regression <- function(data, target, savePath, fileName, train_split = 0.8, seed = 42) {
-    if ("type" %in% colnames(data)){
+
+    if ("quality" %in% colnames(data)){
         # Convert the target column to a binary factor
-        data[["type"]] <- as.factor(ifelse(data[["type"]] == "red", 1, 0))
-        data[["type"]] <- as.factor(ifelse(data[["Quality"]] > 6, 1, 0))
+        data[["quality"]] <- as.factor(ifelse(data[["quality"]] > 6, 1, 0))
     }
 
     # Ensure the target column is a factor
@@ -213,9 +214,9 @@ train_logistic_regression <- function(data, target, savePath, fileName, train_sp
     ))
 }
 train_svc_classifier <- function(data, target, savePath, fileName, train_split = 0.8, seed = 42) {
-    if ("type" %in% colnames(data)) {
+    if ("quality" %in% colnames(data)){
         # Convert the target column to a binary factor
-        data[["type"]] <- as.factor(ifelse(data[["type"]] == "red", 1, 0))
+        data[["quality"]] <- as.factor(ifelse(data[["quality"]] > 6, 1, 0))
     }
 
     # Ensure the target column is a factor
@@ -316,11 +317,6 @@ train_naive_bayes <- function(data, target, savePath, fileName, train_split = 0.
   return(list(model = nbModel, confusion_matrix = confMatrix))
 }
 train_adaboost <- function(data, target, savePath, fileName, train_split = 0.8, nIter = 50, seed = 42) {
-  # # Load necessary library
-  # if (!requireNamespace("adabag", quietly = TRUE)) {
-  #   install.packages("adabag")
-  # }
-  # library(adabag)
 
   # Convert the target column to a factor
   data[[target]] <- as.factor(data[[target]])

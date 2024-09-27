@@ -40,7 +40,7 @@ def processCsv(language, folderPath):
         return None
 
     # Save the final merged DataFrame to a new CSV file
-    output_file = os.path.join(f"R", f"emissions_detailed.csv")
+    output_file = f"emissions_detailed.csv"
     merged_df.to_csv(output_file, index=False)
     print(f"Merged CSV saved to {output_file}")
 
