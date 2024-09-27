@@ -10,13 +10,13 @@ import pandas as pd
 def main():
     datasets = ["breastCancer", "wine", "iris"]
     algorithms = [
-        # "logisticRegression",
+        "logisticRegression",
         "decisionTree",
-        # "randomForest",
-        # "KNN",
-        # "SVC",
-        # "adaBoost",
-        # "naiveBayes"
+        "randomForest",
+        "KNN",
+        "SVC",
+        "adaBoost",
+        "naiveBayes"
     ]
     repetition = 1
     savePath = "csv"
