@@ -40,7 +40,7 @@ calls.
 ---
 
 ## Languages and Algorithms
-
+ 
 ### Supported Languages:
 
 - Python
