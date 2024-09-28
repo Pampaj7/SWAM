@@ -6,7 +6,7 @@ import os
 def save_dataset(X, y, dataset_name, original_path):
     """Save the processed dataset (features and labels) to a CSV file in the same directory as the original dataset."""
     processed_data = pd.DataFrame(X)
-    processed_data["label"] = y
+    processed_data["target"] = y
 
     # Get directory from original path and save the processed file there
     directory = os.path.dirname(original_path)
