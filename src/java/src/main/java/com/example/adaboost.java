@@ -19,7 +19,7 @@ public class adaboost {
     // Create and configure the AdaBoost model
     adaboost = new AdaBoostM1();
     adaboost.setNumIterations(100); // Number of iterations
-    adaboost.setClassifier(new weka.classifiers.functions.SMO()); // Use SMO as the base classifier
+    adaboost.setClassifier(new weka.classifiers.trees.J48()); // Use SMO as the base classifier
     pythonHandler.startTracker("emissions.csv");
     adaboost.buildClassifier(train);
     pythonHandler.stopTracker();
