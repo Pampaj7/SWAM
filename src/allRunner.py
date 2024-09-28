@@ -68,4 +68,4 @@ if __name__ == "__main__":
     # print("\nEsecuzione programma C++:")
     #run_cpp_program()
     # print("\nEsecuzione script Python:")
-    # run_python()
+    run_python()

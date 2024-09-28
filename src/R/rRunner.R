@@ -31,6 +31,8 @@ train_random_forest <- function(data, target, savePath, fileName, train_split = 
   trainData <- data[trainIndex, ]
   testData <- data[-trainIndex, ]
 
+  # Train the Random Forest model
+
   formula <- as.formula(paste(target, "~ ."))
 
   start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
@@ -152,17 +154,32 @@ train_logistic_regression <- function(data, target, savePath, fileName, train_sp
     x_test <- as.matrix(test_data[predictors])
     y_test <- as.factor(test_data[[target]])
 
+    if (num_levels == 2) {
+        # Binary Logistic Regression with glmnet
+        start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
+        model <- cv.glmnet(x_train, y_train, family = "binomial", alpha = 1)
+        stop_tracker()
 
-    # Binary Logistic Regression with glmnet
-    start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
-    model <- cv.glmnet(x_train, y_train, family = "binomial", alpha = 1)
-    stop_tracker()
+        # Make predictions
+        start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
+        predictions <- predict(model, x_test, type = "response")
+        stop_tracker()
+        predicted_class <- ifelse(predictions > 0.5, levels(y_test)[2], levels(y_test)[1])
 
-    # Make predictions
-    start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
-    predictions <- predict(model, x_test, type = "response")
-    stop_tracker()
-    predicted_class <- ifelse(predictions > 0.5, levels(y_test)[2], levels(y_test)[1])
+    } else if (num_levels > 2) {
+        # Multi-Class Logistic Regression with glmnet
+        start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
+        model <- cv.glmnet(x_train, y_train, family = "multinomial", alpha = 1)
+        stop_tracker()
+        # Make predictions
+        start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
+        predictions <- predict(model, x_test, type = "class")
+        stop_tracker()
+        predicted_class <- predictions[, 1]
+
+    } else {
+        stop("The target variable must have at least one level.")
+    }
 
     # Create confusion matrix
     confusion_matrix <- table(Predicted = predicted_class, Actual = y_test)
@@ -208,15 +225,31 @@ train_svc_classifier <- function(data, target, savePath, fileName, train_split =
     x_test <- test_data[predictors]
     y_test <- test_data[[target]]
 
-    # Binary Classification
-    start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
-    model <- svm(x_train, y_train, type = "C-classification", kernel = "radial")
-    stop_tracker()
+    if (num_levels == 2) {
+        # Binary Classification
+        start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
+        model <- svm(x_train, y_train, type = "C-classification", kernel = "radial")
+        stop_tracker()
 
-    # Make predictions
-    start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
-    predictions <- predict(model, x_test)
-    stop_tracker()
+        # Make predictions
+        start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
+        predictions <- predict(model, x_test)
+        stop_tracker()
+
+    } else if (num_levels > 2) {
+        # Multi-Class Classification
+        start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
+        model <- svm(x_train, y_train, type = "C-classification", kernel = "radial")
+        stop_tracker()
+
+        # Make predictions
+        start_tracker(savePath, paste(fileName, "test", "emissions.csv", sep = "_"))
+        predictions <- predict(model, x_test)
+        stop_tracker()
+
+    } else {
+        stop("The target variable must have at least one level.")
+    }
 
     # Create confusion matrix
     confusion_matrix <- table(Predicted = predictions, Actual = y_test)
