@@ -22,7 +22,7 @@ dataWine <- read.csv("../../datasets/winequality/wineQuality_processed.csv")
 
 
 
-train_random_forest <- function(data, target, savePath, fileName, train_split = 0.8, ntree = 100, mtry = 3) {
+train_random_forest <- function(data, target, savePath, fileName, train_split = 0.8, ntree = 100) {
   # Convert the target column to a factor
   data[[target]] <- as.factor(data[[target]])
 
@@ -36,7 +36,7 @@ train_random_forest <- function(data, target, savePath, fileName, train_split = 
   formula <- as.formula(paste(target, "~ ."))
 
   start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
-  rfModel <- randomForest(formula, data = trainData, ntree = ntree, mtry = mtry, importance = TRUE)
+  rfModel <- randomForest(formula, data = trainData, ntree = ntree, importance = TRUE)
   stop_tracker()
 
   # Plot the Random Forest model error rates
@@ -52,7 +52,7 @@ train_random_forest <- function(data, target, savePath, fileName, train_split = 
   # Return the trained model and the confusion matrix
   return(list(model = rfModel, confusion_matrix = confMatrix))
 }
-train_decision_tree <- function(data, target, savePath, fileName, train_split = 0.8, minsplit = 20, cp = 0.01) {
+train_decision_tree <- function(data, target, savePath, fileName, train_split = 0.8) {
 
   # Split the data into training and test sets
   trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
@@ -63,7 +63,7 @@ train_decision_tree <- function(data, target, savePath, fileName, train_split = 
   formula <- as.formula(paste(target, "~ ."))
 
   start_tracker(savePath, paste(fileName, "train", "emissions.csv", sep = "_"))
-  dtModel <- rpart(formula, data = trainData, method = "class", control = rpart.control(minsplit = minsplit, cp = cp))
+  dtModel <- rpart(formula, data = trainData, method = "class")
   stop_tracker()
   # Plot the Decision Tree
   # rpart.plot(dtModel, main = paste("Decision Tree for", target))
@@ -287,7 +287,7 @@ train_naive_bayes <- function(data, target, savePath, fileName, train_split = 0.
   # Return the trained model and the confusion matrix
   return(list(model = nbModel, confusion_matrix = confMatrix))
 }
-train_adaboost <- function(data, target, savePath, fileName, train_split = 0.8, nIter = 50) {
+train_adaboost <- function(data, target, savePath, fileName, train_split = 0.8, nIter = 100) {
 
   # Convert the target column to a factor
   data[[target]] <- as.factor(data[[target]])
