@@ -36,7 +36,7 @@ function runAlgo(algorithm, dataset)
             py.tracker_control.stop_tracker();
         case 'adaBoost'
             py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
-            model = fitcensemble(X_train, y_train, 'Method', 'RUSBoost');
+            model = fitcensemble(X_train, y_train, 'Method', 'RUSBoost', 'NumLearningCycles', 100);
             py.tracker_control.stop_tracker();
         case 'decisionTree'
             py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
@@ -44,7 +44,7 @@ function runAlgo(algorithm, dataset)
             py.tracker_control.stop_tracker();
         case 'randomForest'
             py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
-            model = fitcensemble(X_train, y_train, 'Method', 'Bag', 'Learners', 'tree');
+            model = fitcensemble(X_train, y_train, 'Method', 'Bag', 'NumLearningCycles', 100);
             py.tracker_control.stop_tracker();
         case 'KNN'
             py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));

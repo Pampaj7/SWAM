@@ -1,12 +1,15 @@
-im matlab per aggiungere file da linkare
+% Imposta l'ambiente Python in MATLAB
 >> pyenv('Version', '/Users/pampaj/anaconda3/envs/sw/bin/python');
 
-questo deve restituire la versione
-╰─ /Users/pampaj/anaconda3/envs/sw/bin/python --version                                                                        ─╯
+% Verifica che la versione di Python sia correttamente impostata
+% Questo comando deve restituire la versione di Python installata
+>> system('/Users/pampaj/anaconda3/envs/sw/bin/python --version');
 
-aggiungi il path a matlah
->> insert(py.sys.path,int32(0),'/Users/pampaj/PycharmProjects/SWAM/src/matlab/');
+% Aggiungi il path della cartella in cui si trova il tuo modulo MATLAB
+>> insert(py.sys.path, int32(0), '/Users/pampaj/PycharmProjects/SWAM/src/matlab/');
 
-se funziona questo
-mod = py.importlib.import_module('tracker_control');
-allora significa che è linkato
+% Verifica se il modulo è correttamente linkato
+>> mod = py.importlib.import_module('tracker_control');
+
+% Se il modulo viene importato senza errori, significa che il link è stato effettuato correttamente.
+% Puoi procedere con l'utilizzo delle funzioni definite nel modulo 'tracker_control'.

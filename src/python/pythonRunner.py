@@ -12,13 +12,11 @@ import os
 
 epochs = 1
 
-# Percorso del file
 file_path = ['python/train_emissions_detailed.csv', "python/test_emissions_detailed.csv",
              "python/emissions_detailed.csv"]
 
 for file in file_path:
     if os.path.exists(file):
-        # Cancella il file
         os.remove(file)
         print(f"{file} è stato cancellato.")
     else:
@@ -39,7 +37,6 @@ algorithms = {
 def run_algorithms(X, y, dataset_name):
     results = {name: {"accuracy": 0, "fit_emissions": 0, "predict_emissions": 0} for name in algorithms.values()}
 
-    # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
@@ -74,7 +71,6 @@ def run_algorithms(X, y, dataset_name):
             results[name]["fit_emissions"] += fit_emissions
             results[name]["predict_emissions"] += predict_emissions
 
-        # Average results over the epochs
         results[name]["accuracy"] /= epochs
         results[name]["fit_emissions"] /= epochs
         results[name]["predict_emissions"] /= epochs
@@ -89,7 +85,6 @@ def run_algorithms(X, y, dataset_name):
 
 
 def breastCancerAlgos():
-    # Carica i dati
     csv_file_path = "../datasets/breastcancer/breastCancer_processed.csv"
     data = pd.read_csv(csv_file_path)
 
@@ -100,9 +95,8 @@ def breastCancerAlgos():
 
 
 def irisAlgos():
-    # Carica i dati Iris
     csv_file_path = (
-        "../datasets/iris/iris_processed.csv"  # Modifica con il percorso corretto del tuo file
+        "../datasets/iris/iris_processed.csv"
     )
     data = pd.read_csv(csv_file_path, header=0)
 
@@ -160,7 +154,6 @@ def add_columns(file_path, language):
             df.loc[start_row: end_row - 1, "dataset"] = dataset_name
             df.loc[start_row: end_row - 1, "language"] = language
 
-    # Salva il file CSV con le nuove colonne
     df.to_csv(file_path, index=False)
 
 
@@ -184,7 +177,6 @@ def merge_and_add_source_column(file1_path, file2_path, output_file_path):
     # Unisci i due DataFrame
     merged_df = pd.concat([df1, df2], ignore_index=True)
 
-    # Salva il DataFrame unito in un nuovo file CSV
     merged_df.to_csv(output_file_path, index=False)
 
     print(f"File CSV fusi e salvati in {output_file_path}")
