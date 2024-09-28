@@ -4,14 +4,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from codecarbon import EmissionsTracker
 from sklearn.naive_bayes import GaussianNB
 import os
 
-epochs = 30
+epochs = 1
 
 # Percorso del file
 file_path = ['python/train_emissions_detailed.csv', "python/test_emissions_detailed.csv",
@@ -25,21 +24,15 @@ for file in file_path:
     else:
         print(f"{file} non esiste.")
 
-# Definizione degli algoritmi
+# these hyperparameters are based on the default values of the algorithms
 algorithms = {
-    LogisticRegression(
-        random_state=42, max_iter=10000, class_weight="balanced"
-    ): "logisticRegression",
-    AdaBoostClassifier(random_state=42, n_estimators=100): "AdaBoost",
-
-    DecisionTreeClassifier(random_state=42, class_weight="balanced"): "decisionTree",
-    RandomForestClassifier(
-        random_state=42, n_estimators=100, class_weight="balanced"
-    ): "randomForest",
-    KNeighborsClassifier(n_neighbors=5): "KNN",
-    SVC(kernel="linear", random_state=42, class_weight="balanced"): "SVC",
-    GaussianNB(): "naiveBayes",
-
+    LogisticRegression(max_iter=10000): "logisticRegression",  # Solo max_iter
+    AdaBoostClassifier(n_estimators=100): "AdaBoost",  # Solo n_estimators
+    DecisionTreeClassifier(): "decisionTree",  # Default
+    RandomForestClassifier(n_estimators=100): "randomForest",  # Solo n_estimators
+    KNeighborsClassifier(n_neighbors=5): "KNN",  # Solo n_neighbors
+    SVC(kernel="linear"): "SVC",  # Solo kernel
+    GaussianNB(): "naiveBayes"  # Default
 }
 
 
@@ -97,83 +90,34 @@ def run_algorithms(X, y, dataset_name):
 
 def breastCancerAlgos():
     # Carica i dati
-    csv_file_path = "../datasets/breastcancer/breastcancer.csv"
+    csv_file_path = "../datasets/breastcancer/breastCancer_processed.csv"
     data = pd.read_csv(csv_file_path)
 
-    # Prepara i dati
-    data["diagnosis"] = data["diagnosis"].apply(lambda x: 1 if x == "M" else 0)
-    X = data.drop(columns=["diagnosis", "id"])
-    y = data["diagnosis"]
+    X = data.drop(columns=["target"])
+    y = data["target"]
 
-    # Standardizza i dati
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-
-    # Esegui gli algoritmi e ottieni i risultati
     run_algorithms(X, y, dataset_name="breastCancer")
 
 
 def irisAlgos():
     # Carica i dati Iris
     csv_file_path = (
-        "../datasets/iris/iris.csv"  # Modifica con il percorso corretto del tuo file
+        "../datasets/iris/iris_processed.csv"  # Modifica con il percorso corretto del tuo file
     )
     data = pd.read_csv(csv_file_path, header=0)
 
-    # Definisci i nomi delle colonne
-    data.columns = [
-        "sepal_length",
-        "sepal_width",
-        "petal_length",
-        "petal_width",
-        "species",
-    ]
+    X = data.drop("target", axis=1)
+    y = data["target"]
 
-    # Converti le etichette in numeri
-    data["species"] = data["species"].astype("category").cat.codes
-
-    X = data.drop("species", axis=1)
-    y = data["species"]
-
-    # Standardizza i dati
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-
-    # Esegui gli algoritmi e ottieni i risultati
     run_algorithms(X, y, dataset_name="iris")
 
 
 def wineQualityAlgos():
-    wine_data = pd.read_csv("../datasets/winequality/wine_Data.csv")
+    wine_data = pd.read_csv("../datasets/winequality/wineQuality_processed.csv")
 
-    # Definisci i nomi delle colonne
-    wine_data.columns = [
-        "fixed acidity",
-        "volatile acidity",
-        "citric acid",
-        "residual sugar",
-        "chlorides",
-        "free sulfur dioxide",
-        "total sulfur dioxide",
-        "density",
-        "pH",
-        "sulphates",
-        "alcohol",
-        "quality",
-        "type",
-    ]
-    # Converti il tipo di vino in numeri
-    wine_data["type"] = wine_data["type"].astype("category").cat.codes
-    wine_data["quality"] = wine_data["quality"] - wine_data["quality"].min()
+    X = wine_data.drop("target", axis=1)
+    y = wine_data["target"]
 
-    X = wine_data.drop("quality", axis=1)
-    y = wine_data["quality"]
-
-    # Standardizza i dati
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-
-    # Esegui gli algoritmi e ottieni i risultati
     run_algorithms(X, y, dataset_name="wine")
 
 
