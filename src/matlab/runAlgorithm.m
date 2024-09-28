@@ -1,57 +1,34 @@
 function runAlgo(algorithm, dataset)
-    % Carica i dati
+    %needed to select path to own matlab functions
     pyenv('Version', '/Users/pampaj/anaconda3/envs/sw/bin/python');
     insert(py.sys.path, int32(0), '/Users/pampaj/PycharmProjects/SWAM/src/matlab/');
 
-    % Seleziona il dataset
     switch dataset
         case 'breastCancer'
-            data = readtable('../datasets/breastcancer/breastcancer.csv');
-            data.diagnosis = double(categorical(data.diagnosis)) - 1; % 1 per 'M', 0 per 'B'
-            X = data{:, setdiff(data.Properties.VariableNames, {'diagnosis', 'id'})};
-            y = data.diagnosis;
+            data = readtable('../datasets/breastcancer/breastCancer_processed.csv');
+            %disp(data.Properties.VariableNames);
+            %displayed in Var..
+            X = data{:, setdiff(data.Properties.VariableNames, {'Var31'})};  % Estrai tutte le colonne tranne 'target'
+            y = data.Var31;
         case 'wine'
-            data = readtable('../datasets/winequality/wine_data.csv', 'ReadVariableNames', false);
-
-            % Definisci i nomi delle colonne
-            data.Properties.VariableNames = {'fixed_acidity', 'volatile_acidity', 'citric_acid', 'residual_sugar', ...
-                                             'chlorides', 'free_sulfur_dioxide', 'total_sulfur_dioxide', 'density', ...
-                                             'pH', 'sulphates', 'alcohol', 'quality', 'type'};
-
-            X = data{:, 1:end-1};
-            y = data.quality;
+            data = readtable('../datasets/winequality/wineQuality_processed.csv', 'ReadVariableNames', false);
+            X = data{:, setdiff(data.Properties.VariableNames, {'Var13'})};
+            y = data.Var13;
         case 'iris'
-            data = readtable('../datasets/iris/iris.csv', 'ReadVariableNames', false);
-
-            % Definisci i nomi delle colonne
-            data.Properties.VariableNames = {'sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species'};
-
-            % Trasforma le specie in numeri
-            y = double(categorical(data.species)); % Converti le specie in numeri
-            X = data{:, setdiff(data.Properties.VariableNames, {'species'})}; % Usa tutte le colonne tranne 'species'
+            data = readtable('../datasets/iris/iris_processed.csv', 'ReadVariableNames', false);
+            X = data{:, setdiff(data.Properties.VariableNames, {'Var5'})};
+            y = data.Var5;
         otherwise
             error('Dataset unknown');
     end
 
-    % Standardizza i dati
-    X = normalize(X);
 
-    % Divisione dei dati in set di addestramento e di test
     cv = cvpartition(y, 'HoldOut', 0.2);
     X_train = X(training(cv), :);
     X_test = X(test(cv), :);
     y_train = y(training(cv));
     y_test = y(test(cv));
 
-    % Rimuove le feature con varianza nulla per evitare errori in Naive Bayes
-    zeroVarianceIdx = var(X_train) == 0;
-    X_train(:, zeroVarianceIdx) = [];
-    X_test(:, zeroVarianceIdx) = [];
-
-    % Inizio tracciamento prima del fitting
-    py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
-
-    % Seleziona l'algoritmo e addestra il modello
     switch algorithm
         case 'logisticRegression'
             py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
@@ -75,7 +52,7 @@ function runAlgo(algorithm, dataset)
             py.tracker_control.stop_tracker();
         case 'SVC'
             py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
-            model = fitcecoc(X_train, y_train);
+            model = fitcecoc(X_train, y_train, 'Learners', templateSVM('KernelFunction', 'linear'));
             py.tracker_control.stop_tracker();
         case 'naiveBayes'
             py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
@@ -84,17 +61,13 @@ function runAlgo(algorithm, dataset)
         otherwise
             error('Algorithm unknown');
     end
-    % Stop tracciamento dopo il fitting e prima della predizione
+
     py.tracker_control.stop_tracker();
 
-    % Inizio tracciamento prima della predizione
     py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_test_emissions.csv', algorithm, dataset));
-
-    % Calcola le predizioni
 
     y_pred = predict(model, X_test);
 
-    % Stop tracciamento dopo la predizione
     py.tracker_control.stop_tracker();
 
     % Calcola l'accuratezza

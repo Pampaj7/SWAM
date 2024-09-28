@@ -56,7 +56,7 @@ if __name__ == "__main__":
     #print("Esecuzione di tutti i runner:")
     #
     #print("\nEsecuzione R script:")
-    run_r_script()
+    #run_r_script()
 
     # print("\nEsecuzione matlabRunner:")
     run_matlab_script()

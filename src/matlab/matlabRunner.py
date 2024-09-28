@@ -2,7 +2,7 @@ import matlab.engine
 import pandas as pd
 import os
 
-epochs = 30
+epochs = 1
 
 # Percorso della cartella contenente i file da eliminare
 directory_path = 'matlab/models'
@@ -97,14 +97,6 @@ def processCsv(language):
 
 
 def mergeCsvFiles(directory_path, merged_file_path):
-    """
-    Unisce tutti i file CSV presenti nella directory specificata e salva il risultato in un nuovo file CSV.
-
-    Parameters:
-    - directory_path: Percorso della directory contenente i file CSV da unire.
-    - merged_file_path: Percorso del file CSV finale dove verranno salvati i dati uniti.
-    """
-    # Elenco di tutti i file nella cartella
     all_files = [os.path.join(directory_path, file_name) for file_name in os.listdir(directory_path) if
                  file_name.endswith('.csv')]
 

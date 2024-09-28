@@ -12,6 +12,35 @@ def load_dataset(file_path):
     return df
 
 
+def plot_bubble_execution_time_by_language_and_algorithm(df, language_col, algorithm_col, time_col, type_col,
+                                                         type_value,
+                                                         title, excluded_language):
+    # Filter the data to exclude unwanted languages and select the specific phase
+    if excluded_language:
+        df = df[df[language_col] != excluded_language]
+    filtered_df = df[df[type_col] == type_value]
+
+    # Group by language and algorithm, summing the execution time
+    grouped_data = filtered_df.groupby([language_col, algorithm_col])[time_col].sum().reset_index()
+
+    # Create the bubble plot
+    plt.figure(figsize=(12, 8))
+
+    # Plot the bubbles using seaborn
+    sns.scatterplot(data=grouped_data, x=algorithm_col, y=language_col, size=time_col,
+                    sizes=(50, 10000), legend=False, hue=time_col, palette="tab20", alpha=1)
+
+    # Title and labels
+    plt.title(title)
+    plt.xlabel('Algorithm')
+    plt.ylabel('Language')
+
+    # Show plot
+    plt.grid(True)
+    plt.savefig("graphics/" + title)
+    plt.show()
+
+
 def plot_execution_time_by_language_and_algorithm(df, language_col, algorithm_col, time_col, type_col, type_value,
                                                   title, excluded_language):
     if excluded_language:
@@ -24,8 +53,9 @@ def plot_execution_time_by_language_and_algorithm(df, language_col, algorithm_co
     grouped_data.plot(kind='bar', stacked=True, colormap='tab20', figsize=(12, 8))
     plt.title(title)
     plt.ticklabel_format(style='scientific', axis='y', scilimits=(0, 0))
-    plt.xlabel('Language')
+    plt.xlabel('Algorithm')
     plt.grid(True)
+    plt.xticks(rotation=0)
     plt.ylabel('CPU Energy (Joules)')
     plt.savefig("graphics/" + title)
     plt.show()
@@ -81,9 +111,7 @@ def plot_performance_heatmap(df, language_col, algorithm_col, duration_col,
                                            aggfunc='mean')
         pivot_table *= 1000  # Convert seconds to milliseconds
 
-
-
-        #pivot_table_log = np.log10(pivot_table)
+        # pivot_table_log = np.log10(pivot_table)
 
         # Plot heatmap
         sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="viridis", ax=ax,
@@ -253,7 +281,8 @@ def plot_time_series(df, language, dataset, algorithm, date_col, value_col, phas
     plt.show()
 
 
-def plot_time_series_all_algorithms(df, language, date_col, value_col, phase_col='phase', phase='train', dataset="breastCancer"):
+def plot_time_series_all_algorithms(df, language, date_col, value_col, phase_col='phase', phase='train',
+                                    dataset="breastCancer"):
     """
     Plot time series data for all algorithms for a specific language and dataset in a given phase.
 
@@ -453,9 +482,25 @@ plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_
                                               title="CPU energy distribution by language and algorithm (Train)",
                                               excluded_language='None')
 """
+plot_execution_time_by_language_and_algorithm(df, 'algorithm', 'language', 'cpu_energy', 'phase', 'train',
+                                              title="CPU energy distribution by algo and lang (Train)",
+                                              excluded_language='None')
+
+plot_execution_time_by_language_and_algorithm(df, 'algorithm', 'language', 'cpu_energy', 'phase', 'test',
+                                              title="CPU energy distribution by algo and lang (Test)",
+                                              excluded_language='None')
+
+plot_bubble_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_energy', 'phase', 'train',
+                                                     title="Bubble plot of CPU energy by language and algorithm (Train)",
+                                                     excluded_language='None')
+plot_bubble_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_energy', 'phase', 'test',
+                                                     title="Bubble plot of CPU energy by language and algorithm (Test)",
+                                                     excluded_language='None')
+"""
+
 plot_performance_heatmap(df, 'language', 'algorithm', 'duration', 'phase', )
 
-"""plot_execution_time_by_dataset(df, 'dataset', 'emissions', 'language')
+plot_execution_time_by_dataset(df, 'dataset', 'emissions', 'language')
 
 plot_correlation_by_phase(df, 'cpu_energy', 'emissions', 'phase', 'language',
                           title_prefix="Correlation_by_Phase_emissions")
