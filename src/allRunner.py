@@ -1,4 +1,5 @@
 import subprocess
+
 """from R.rRunner import mainR
 from R.rRunner import maintest
 # import matlab.engine
@@ -15,6 +16,7 @@ def run_r_script():
     mainR()
 
 """
+
 
 def run_python():
     result = subprocess.run(
@@ -54,18 +56,18 @@ def run_cpp_program():
 
 
 if __name__ == "__main__":
-    #print("Esecuzione di tutti i runner:")
+    # print("Esecuzione di tutti i runner:")
     #
-    #print("\nEsecuzione R script:")
-    #run_r_script()
+    # print("\nEsecuzione R script:")
+    # run_r_script()
 
     # print("\nEsecuzione matlabRunner:")
     run_matlab_script()
     #
     # print("\nEsecuzione programma Java:")
-    #run_java_program()
+    # run_java_program()
     #
     # print("\nEsecuzione programma C++:")
-    #run_cpp_program()
+    # run_cpp_program()
     # print("\nEsecuzione script Python:")
     run_python()
