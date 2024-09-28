@@ -13,11 +13,9 @@ python allRunner.py
 echo "Navigating to the R directory and setting up the R environment..."
 cd R
 
-# Check if Rmarkdown is installed and install it if missing
 echo "Checking if Rmarkdown is installed..."
 Rscript -e "if (!require('rmarkdown')) install.packages('rmarkdown', repos='http://cran.rstudio.com/')"
 
-# Rendering requirements.Rmd to install R packages and set up the R environment
 echo "Rendering requirements.Rmd to install required R packages..."
 Rscript -e "rmarkdown::render('requirements.Rmd')"
 
