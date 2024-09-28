@@ -54,23 +54,36 @@ function runAlgo(algorithm, dataset)
     % Seleziona l'algoritmo e addestra il modello
     switch algorithm
         case 'logisticRegression'
+            py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
             model = fitcecoc(X_train, y_train, 'Learners', 'linear');
+            py.tracker_control.stop_tracker();
         case 'adaBoost'
+            py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
             model = fitcensemble(X_train, y_train, 'Method', 'RUSBoost');
+            py.tracker_control.stop_tracker();
         case 'decisionTree'
+            py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
             model = fitctree(X_train, y_train);
+            py.tracker_control.stop_tracker();
         case 'randomForest'
+            py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
             model = fitcensemble(X_train, y_train, 'Method', 'Bag', 'Learners', 'tree');
+            py.tracker_control.stop_tracker();
         case 'KNN'
+            py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
             model = fitcknn(X_train, y_train, 'NumNeighbors', 5);
+            py.tracker_control.stop_tracker();
         case 'SVC'
+            py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
             model = fitcecoc(X_train, y_train);
+            py.tracker_control.stop_tracker();
         case 'naiveBayes'
+            py.tracker_control.start_tracker('matlab/models', sprintf('%s_%s_train_emissions.csv', algorithm, dataset));
             model = fitcnb(X_train, y_train, 'DistributionNames', 'kernel');
+            py.tracker_control.stop_tracker();
         otherwise
             error('Algorithm unknown');
     end
-
     % Stop tracciamento dopo il fitting e prima della predizione
     py.tracker_control.stop_tracker();
 
