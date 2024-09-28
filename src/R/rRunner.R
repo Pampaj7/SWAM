@@ -13,7 +13,7 @@ library(reticulate)
 library(adabag)
 
 
-use_python("/opt/homebrew/Caskroom/miniforge/base/envs/swam/bin/python", required = TRUE)
+use_python('/Users/pampaj/anaconda3/envs/sw/bin/python', required = TRUE)
 source_python("../matlab/tracker_control.py")
 
 dataIris <- read.csv("../../datasets/iris/iris_processed.csv")

@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 
-
 def processCsv(language, folderPath):
     # Initialize an empty list to hold dataframes
     merged_dataframes = []

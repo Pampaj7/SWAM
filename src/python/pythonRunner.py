@@ -59,7 +59,6 @@ def run_algorithms(X, y, dataset_name):
         for epoch in range(epochs):
             print(f"Epoch {epoch + 1}/{epochs}")
 
-            # need to evaluate: same file or separated?
             fit_tracker = EmissionsTracker(output_dir="python", output_file=f"train_{file_name}")
             fit_tracker.start()
             model.fit(X_train, y_train)
