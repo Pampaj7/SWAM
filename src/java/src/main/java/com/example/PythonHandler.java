@@ -12,6 +12,8 @@ public class PythonHandler {
     ProcessBuilder pb = new ProcessBuilder(
         "/Users/pampaj/anaconda3/envs/sw/bin/python",
         "/Users/pampaj/PycharmProjects/SWAM/src/java/src/main/python/tracker_control.py");
+    // "/Users/niccolomarini/Documents/GitHub/SWAM/.venv/bin/python",
+    // "/Users/niccolomarini/Documents/GitHub/SWAM/src/java/src/main/python/tracker_control.py");
     this.process = pb.start();
     this.executor = Executors.newFixedThreadPool(2);
 

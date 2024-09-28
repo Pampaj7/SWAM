@@ -1,11 +1,9 @@
 package com.example;
 
-import scala.tools.nsc.doc.html.HtmlTags.P;
 import weka.classifiers.functions.Logistic;
 import weka.core.Instances;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.NumericToNominal;
 import weka.core.SerializationHelper;
+import weka.classifiers.Evaluation;
 
 public class logreg {
   public static long startTime;
@@ -15,35 +13,23 @@ public class logreg {
   private static Logistic logistic;
   private static PythonHandler pythonHandler = new PythonHandler();
 
-  public static Instances convertClassToNominal(Instances data, String targetLabelName) throws Exception {
-    int targetIndex = data.attribute(targetLabelName).index();
-    data.setClassIndex(targetIndex);
-
-    if (data.classAttribute().isNumeric()) {
-      NumericToNominal convert = new NumericToNominal();
-      String[] options = new String[] { "-R", String.valueOf(targetIndex + 1) };
-      convert.setOptions(options);
-      convert.setInputFormat(data);
-      data = Filter.useFilter(data, convert);
-    }
-
-    return data;
-  }
-
   public static void train(Instances data, String targetLabelName) {
     try {
-      // Start the tracker
-
       // Perform data processing and training
-      data = convertClassToNominal(data, targetLabelName);
+      data = loader.convertClassToNominal(data, targetLabelName);
+      Instances[] split = loader.stratifiedSplit(data, 0.8, 42);
+      Instances train = split[0];
 
       logistic = new Logistic();
+      String[] options = new String[2];
+      options[0] = "-M";
+      options[1] = "10000";
+      logistic.setOptions(options);
 
       pythonHandler.startTracker("emissions.csv");
-      logistic.buildClassifier(data);
-
-      // Stop the tracker
+      logistic.buildClassifier(train);
       pythonHandler.stopTracker();
+
       // Save the model to a file
       SerializationHelper.write(MODEL_FILE, logistic);
       System.out.println("Model saved to " + MODEL_FILE);
@@ -64,30 +50,15 @@ public class logreg {
       return;
     }
 
-    data.setClassIndex(data.attribute(targetLabelName).index());
-    data = convertClassToNominal(data, targetLabelName);
+    data = loader.convertClassToNominal(data, targetLabelName);
+    Instances[] split = loader.stratifiedSplit(data, 0.8, 42);
+    Instances test = split[1];
 
+    Evaluation evaluation = new Evaluation(split[0]);
     pythonHandler.startTracker("emissions.csv");
-    double accuracy = evaluateModel(logistic, data);
+    evaluation.evaluateModel(logistic, test);
     pythonHandler.stopTracker();
-    System.out.println("Logistic Regression Test Accuracy: " + accuracy);
-  }
+    System.out.println("Logistic Regression Accuracy: " + evaluation.pctCorrect() + "%");
 
-  private static double evaluateModel(Logistic model, Instances data) throws Exception {
-    int trainSize = (int) (data.numInstances() * 0.8);
-    int testSize = data.numInstances() - trainSize;
-    Instances trainData = new Instances(data, 0, trainSize);
-    Instances testData = new Instances(data, trainSize, testSize);
-
-    int correct = 0;
-    for (int i = 0; i < testData.numInstances(); i++) {
-      double actualClass = testData.instance(i).classValue();
-      double predictedClass = model.classifyInstance(testData.instance(i));
-
-      if (actualClass == predictedClass) {
-        correct++;
-      }
-    }
-    return (double) correct / testData.numInstances();
   }
 }

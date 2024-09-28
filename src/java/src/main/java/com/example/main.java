@@ -41,18 +41,7 @@ public class main {
     String algorithm = args[1];
     String train = args[2];
     Instances data = loadDataset(datasetName);
-    String targetLabel = "";
-    switch (datasetName) {
-      case "breastCancer":
-        targetLabel = "diagnosis";
-        break;
-      case "iris":
-        targetLabel = "species";
-        break;
-      case "wine":
-        targetLabel = "quality";
-        break;
-    }
+    String targetLabel = "target";
 
     if (data == null) {
       System.out.println("No data loaded. Exiting.");

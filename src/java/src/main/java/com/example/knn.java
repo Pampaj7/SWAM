@@ -1,6 +1,5 @@
 package com.example;
 
-import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
@@ -8,9 +7,6 @@ import weka.classifiers.Evaluation;
 
 public class knn {
 
-  public static long startTime;
-  public static long endTime;
-  public static double elapsedTime;
   private static final String MODEL_FILE = "knnModel.model";
   private static IBk knn;
   private static PythonHandler pythonHandler = new PythonHandler();
@@ -19,14 +15,15 @@ public class knn {
     // Set the class index based on the target label name
     int targetIndex = data.attribute(targetLabelName).index();
     data.setClassIndex(targetIndex);
+    Instances[] split = loader.stratifiedSplit(data, 0.8, 42);
+    Instances train = split[0];
 
     // Create and configure the k-NN model
     knn = new IBk();
-    knn.setKNN(3); // Set k to 3 for example
+    knn.setKNN(5); // Set k to 3 for example
     pythonHandler.startTracker("emissions.csv");
-    knn.buildClassifier(data);
+    knn.buildClassifier(train);
     pythonHandler.stopTracker();
-    // loader.editCsv(elapsedTime);
 
     // Save the model to a file
     SerializationHelper.write(MODEL_FILE, knn);
@@ -47,27 +44,13 @@ public class knn {
     // Set the class index based on the target label name
     int targetIndex = data.attribute(targetLabelName).index();
     data.setClassIndex(targetIndex);
+    Instances[] split = loader.stratifiedSplit(data, 0.8, 42);
+    Instances test = split[1];
 
-    // Evaluate the model using Weka's Evaluation class
+    Evaluation evaluation = new Evaluation(split[0]); // Pass training set for evaluation context
     pythonHandler.startTracker("emissions.csv");
-    Evaluation evaluation = evaluateModel(knn, data);
+    evaluation.evaluateModel(knn, test);
     pythonHandler.stopTracker();
-    // loader.editCsv(elapsedTime);
-  }
-
-  private static Evaluation evaluateModel(IBk model, Instances data) throws Exception {
-    // Perform a train-test split
-    int trainSize = (int) (data.numInstances() * 0.8);
-    int testSize = data.numInstances() - trainSize;
-    Instances trainData = new Instances(data, 0, trainSize);
-    Instances testData = new Instances(data, trainSize, testSize);
-
-    // Initialize Evaluation object
-    Evaluation evaluation = new Evaluation(trainData);
-    // pythonHandler.startTracker("emissions.csv");
-    evaluation.evaluateModel(model, testData);
-    // pythonHandler.stopTracker();
-
-    return evaluation;
+    // System.out.println("k-NN Accuracy: " + evaluation.toSummaryString() + "%");
   }
 }
