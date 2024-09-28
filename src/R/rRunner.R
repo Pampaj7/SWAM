@@ -13,22 +13,20 @@ library(reticulate)
 library(adabag)
 
 
-set.seed(42)
 use_python("/opt/homebrew/Caskroom/miniforge/base/envs/swam/bin/python", required = TRUE)
 source_python("../matlab/tracker_control.py")
 
-dataIris <- read.csv("../../datasets/iris/iris.csv")
-dataBreastCancer <- read.csv("../../datasets/breastcancer/breastcancer.csv")
-dataWine <- read.csv("../../datasets/winequality/wine_data.csv")
+dataIris <- read.csv("../../datasets/iris/iris_processed.csv")
+dataBreastCancer <- read.csv("../../datasets/breastcancer/breastCancer_processed.csv")
+dataWine <- read.csv("../../datasets/winequality/wineQuality_processed.csv")
 
 
 
-train_random_forest <- function(data, target, savePath, fileName, train_split = 0.8, ntree = 100, mtry = 3, seed=42) {
+train_random_forest <- function(data, target, savePath, fileName, train_split = 0.8, ntree = 100, mtry = 3) {
   # Convert the target column to a factor
   data[[target]] <- as.factor(data[[target]])
 
   # Split the data into training and test sets
-  set.seed(seed)
   trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
   trainData <- data[trainIndex, ]
   testData <- data[-trainIndex, ]
@@ -54,14 +52,9 @@ train_random_forest <- function(data, target, savePath, fileName, train_split = 
   # Return the trained model and the confusion matrix
   return(list(model = rfModel, confusion_matrix = confMatrix))
 }
-train_decision_tree <- function(data, target, savePath, fileName, train_split = 0.8, minsplit = 20, cp = 0.01, seed = 42) {
-  # Convert the target column to a factor if it's not numeric
-  if(!is.numeric(data[[target]])) {
-    data[[target]] <- as.factor(data[[target]])
-  }
+train_decision_tree <- function(data, target, savePath, fileName, train_split = 0.8, minsplit = 20, cp = 0.01) {
 
   # Split the data into training and test sets
-  set.seed(seed)  # For reproducibility
   trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
   trainData <- data[trainIndex, ]
   testData <- data[-trainIndex, ]
@@ -90,19 +83,9 @@ train_decision_tree <- function(data, target, savePath, fileName, train_split = 
   # Return the trained model and the performance metrics
   return(list(model = dtModel, performance = if (is.factor(data[[target]])) confMatrix else rmse))
 }
-train_knn <- function(data, target, savePath, fileName, train_split = 0.8, k = 5, seed = 42) {
-
-  if ("type" %in% colnames(data)){
-    # Convert the target column to a binary factor
-    data[["type"]] <- as.factor(ifelse(data[["type"]] == "red", 1, 0))
-  }
-  # Convert the target column to a factor if it's not numeric
-  if (!is.numeric(data[[target]])) {
-    data[[target]] <- as.factor(data[[target]])
-  }
+train_knn <- function(data, target, savePath, fileName, train_split = 0.8, k = 5) {
 
   # Split the data into training and test sets
-  set.seed(seed)  # For reproducibility
   trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
   trainData <- data[trainIndex, ]
   testData <- data[-trainIndex, ]
@@ -136,12 +119,7 @@ train_knn <- function(data, target, savePath, fileName, train_split = 0.8, k = 5
   # Return the performance metrics
   return(if (is.factor(data[[target]])) confMatrix else rmse)
 }
-train_logistic_regression <- function(data, target, savePath, fileName, train_split = 0.8, seed = 42) {
-
-    if ("quality" %in% colnames(data)){
-        # Convert the target column to a binary factor
-        data[["quality"]] <- as.factor(ifelse(data[["quality"]] > 6, 1, 0))
-    }
+train_logistic_regression <- function(data, target, savePath, fileName, train_split = 0.8) {
 
     # Ensure the target column is a factor
     data[[target]] <- as.factor(data[[target]])
@@ -150,7 +128,6 @@ train_logistic_regression <- function(data, target, savePath, fileName, train_sp
     num_levels <- length(levels(data[[target]]))
 
     # Split the data into training and testing sets
-    set.seed(seed)
     split <- sample.split(data[[target]], SplitRatio = train_split)
     train_data <- subset(data, split == TRUE)
     test_data <- subset(data, split == FALSE)
@@ -213,11 +190,7 @@ train_logistic_regression <- function(data, target, savePath, fileName, train_sp
         confusion_matrix = confusion_matrix
     ))
 }
-train_svc_classifier <- function(data, target, savePath, fileName, train_split = 0.8, seed = 42) {
-    if ("quality" %in% colnames(data)){
-        # Convert the target column to a binary factor
-        data[["quality"]] <- as.factor(ifelse(data[["quality"]] > 6, 1, 0))
-    }
+train_svc_classifier <- function(data, target, savePath, fileName, train_split = 0.8) {
 
     # Ensure the target column is a factor
     data[[target]] <- as.factor(data[[target]])
@@ -226,7 +199,6 @@ train_svc_classifier <- function(data, target, savePath, fileName, train_split =
     num_levels <- length(levels(data[[target]]))
 
     # Split the data into training and testing sets
-    set.seed(seed)
     split <- sample.split(data[[target]], SplitRatio = train_split)
     train_data <- subset(data, split == TRUE)
     test_data <- subset(data, split == FALSE)
@@ -288,12 +260,11 @@ train_svc_classifier <- function(data, target, savePath, fileName, train_split =
         confusion_matrix = confusion_matrix
     ))
 }
-train_naive_bayes <- function(data, target, savePath, fileName, train_split = 0.8, seed = 42) {
+train_naive_bayes <- function(data, target, savePath, fileName, train_split = 0.8) {
   # Convert the target column to a factor
   data[[target]] <- as.factor(data[[target]])
 
   # Split the data into training and test sets
-  set.seed(seed)
   trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
   trainData <- data[trainIndex, ]
   testData <- data[-trainIndex, ]
@@ -316,13 +287,12 @@ train_naive_bayes <- function(data, target, savePath, fileName, train_split = 0.
   # Return the trained model and the confusion matrix
   return(list(model = nbModel, confusion_matrix = confMatrix))
 }
-train_adaboost <- function(data, target, savePath, fileName, train_split = 0.8, nIter = 50, seed = 42) {
+train_adaboost <- function(data, target, savePath, fileName, train_split = 0.8, nIter = 50) {
 
   # Convert the target column to a factor
   data[[target]] <- as.factor(data[[target]])
 
   # Split the data into training and test sets
-  set.seed(seed)
   trainIndex <- createDataPartition(data[[target]], p = train_split, list = FALSE)
   trainData <- data[trainIndex, ]
   testData <- data[-trainIndex, ]
@@ -347,18 +317,15 @@ train_adaboost <- function(data, target, savePath, fileName, train_split = 0.8, 
 }
 
 
-
-
-
 run_model_with_dataset <- function(datasetName, algorithmName, savePath){
   dataset <- switch (datasetName,
-    "iris" = list(data = dataIris, target = "Species"),
-    "breastCancer" = list(data = dataBreastCancer, target = "diagnosis"),
-    "wine" = list(data = dataWine, target = "quality"),
+    "iris" = dataIris,
+    "breastCancer" = dataBreastCancer,
+    "wine" = dataWine,
     stop("invalid dataset name")
   )
-  dataMatrix <- dataset$data
-  targetValue <- dataset$target
+  dataMatrix <- dataset
+  targetValue <- "target"
   name <- paste(algorithmName, datasetName, sep = "_")
   result <- switch (algorithmName,
     "randomForest" = train_random_forest(data = dataMatrix, target = targetValue, savePath = savePath, fileName = name),
