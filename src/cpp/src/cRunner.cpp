@@ -24,24 +24,20 @@ enum Algs {
 // Define dataset information structure
 struct DatasetInfo {
   std::string filePath;
-  std::string targetColumn;
-  std::unordered_map<std::string, size_t> targetMapping;
 };
 
 // Define a mapping for datasets
 const std::unordered_map<std::string, DatasetInfo> datasetMap = {
     {"breastCancer",
-     {"../../datasets/breastcancer/dataset_processed/"
-      "breastcancer_processed.csv",
-      "diagnosis",
-      {{"M", 1}, {"B", 0}}}},
+     {"../../datasets/breastcancer/breastCancer_processed.csv"}},
     {"iris",
-     {"../../datasets/iris/dataset_processed/iris_processed.csv",
-      "species",
-      {{"Iris-setosa", 0}, {"Iris-versicolor", 1}, {"Iris-virginica", 2}}}},
+     {
+         "../../datasets/iris/iris_processed.csv",
+     }},
     {"wine",
-     {"../../datasets/winequality/dataset_processed/wine_Data_processed.csv",
-      "quality"}}};
+     {
+         "../../datasets/winequality/wineQuality_processed.csv",
+     }}};
 
 // Function to load dataset based on string identifier
 std::pair<arma::mat, arma::Row<size_t>>
@@ -52,7 +48,7 @@ loadDataset(const std::string &datasetName) {
   }
 
   const DatasetInfo &info = it->second;
-  return load_data_from_csv(it->second.filePath, it->second.targetColumn);
+  return load_data_from_csv(it->second.filePath);
   // it->second.targetMapping);
 }
 

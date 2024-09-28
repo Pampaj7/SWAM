@@ -38,20 +38,11 @@ void TrainLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
   mlpack::data::Split(x, y, trainX, testX, trainY, testY, 0.2,
                       true); // 80% training, 20% testing
 
-  // Standardize the training data
-  mlpack::data::StandardScaler scaler;
-
-  // Call start_tracker
-
-  scaler.Fit(trainX);
-
-  scaler.Transform(trainX, trainX);
-
   // Train the logistic regression model
+  mlpack::LogisticRegression<> logreg;
   CallPython("tracker_control", "Tracker", "start_tracker", pArgsStart);
-  mlpack::LogisticRegression<> logreg(trainX, trainY);
+  logreg.Train(trainX, trainY);
   CallPython("tracker_control", "Tracker", "stop_tracker", pArgsStop);
-
 
   Py_DECREF(pArgsStart);
 
@@ -87,11 +78,6 @@ void TestLogisticRegression(std::pair<arma::mat, arma::Row<size_t>> data) {
     arma::Row<size_t> trainY, testY;
     mlpack::data::Split(x, y, trainX, testX, trainY, testY, 0.2,
                         true); // 80% training, 20% testing
-
-    // Standardize the test data using the same scaler
-    mlpack::data::StandardScaler scaler;
-    scaler.Fit(trainX);
-    scaler.Transform(testX, testX);
 
     // Predict on the test set
     arma::Row<size_t> predictions;

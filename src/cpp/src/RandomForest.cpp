@@ -36,8 +36,8 @@ void TrainRandomForest(std::pair<arma::mat, arma::Row<size_t>> data) {
                 true); // 80% training, 20% testing
 
     // Parameters for RandomForest
-    const size_t numTrees = 100;          // Number of trees
-    const size_t numClasses = 2;          // Number of classes
+    const size_t numTrees = 100; // Number of trees
+    const size_t numClasses = max(y) + 1;
     const size_t minimumLeafSize = 1;     // Minimum leaf size
     const bool computeImportance = false; // Not computing feature importance
     const size_t maxDepth = 0;            // Unlimited depth

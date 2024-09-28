@@ -31,5 +31,5 @@ pkg_check_modules(Armadillo REQUIRED Armadillo)
 include_directories(${MLPACK_INCLUDE_DIRS})
 include_directories(${DIVISIBLE_INSTALL_INCLUDE_DIR})
 include_directories(${DIVISION_HEADERS_DIR})
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(src)

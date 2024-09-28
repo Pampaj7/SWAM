@@ -5,15 +5,12 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 std::pair<arma::mat, arma::Row<size_t>>
-load_data_from_csv(const std::string &filename,
-                   const std::string &targetColumnName) {
+load_data_from_csv(const std::string &filename) {
   std::vector<std::vector<double>> X;
   std::vector<size_t> y;
-  std::vector<std::string> headers;
   size_t targetColumnIndex = std::string::npos;
 
   if (!std::filesystem::exists(filename)) {
@@ -28,25 +25,16 @@ load_data_from_csv(const std::string &filename,
   std::string line;
   std::getline(file, line); // Read the header line
 
-  // Parse the header to get the column names
+  // Parse the header to get the number of columns
   std::istringstream headerStream(line);
+  size_t numColumns = 0;
   std::string headerToken;
   while (std::getline(headerStream, headerToken, ',')) {
-    headers.push_back(headerToken);
+    numColumns++;
   }
 
-  // Find the index of the target column by name
-  for (size_t i = 0; i < headers.size(); ++i) {
-    if (headers[i] == targetColumnName) {
-      targetColumnIndex = i;
-      break;
-    }
-  }
-
-  if (targetColumnIndex == std::string::npos) {
-    throw std::runtime_error("Target column name not found in the header: " +
-                             targetColumnName);
-  }
+  // Set the target column index as the last column
+  targetColumnIndex = numColumns - 1;
 
   // Process the data
   while (std::getline(file, line)) {
@@ -74,7 +62,7 @@ load_data_from_csv(const std::string &filename,
       }
     }
 
-    if (!row.empty()) {
+    if (row.size() == targetColumnIndex) { // Ensure the row is valid
       X.push_back(row);
     }
   }

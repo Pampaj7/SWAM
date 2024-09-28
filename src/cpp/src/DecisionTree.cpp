@@ -41,7 +41,7 @@ void TrainDecisionTree(std::pair<arma::mat, arma::Row<size_t>> data) {
   arma::mat trainX, testX;
   arma::Row<size_t> trainY, testY;
   data::Split(x, y, trainX, testX, trainY, testY, 0.2,
-              true); // 81% training, 20% testing
+              true); // 80% training, 20% testing
 
   // Determine the number of classes
   size_t numClasses = max(y) + 1;

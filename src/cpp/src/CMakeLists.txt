@@ -12,8 +12,10 @@ find_package(pybind11 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 find_package(PythonLibs REQUIRED)
 set(BOOST_ROOT "/opt/homebrew/Cellar/boost/1.86.0/include/boost/")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include_directories(${OpenCV_INCLUDE_DIRS})
 add_executable(crunner ${SOURCE_FILES})
 target_link_libraries(crunner PUBLIC ${XGBOOST_LIBRARY} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${ACCELERATE_FRAMEWORK} ${OpenCV_LIBS} PRIVATE pybind11::module Python3::Python Boost::system Boost::filesystem)
+
 
 install(TARGETS crunner DESTINATION ${DIVISIBLE_INSTALL_BIN_DIR})
