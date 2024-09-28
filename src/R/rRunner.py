@@ -74,5 +74,4 @@ def handle_subprocess_result(result: subprocess.CompletedProcess):
         print("No errors occurred.")
 
 
-
 main()
