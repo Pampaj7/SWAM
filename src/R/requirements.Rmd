@@ -6,35 +6,43 @@ output: html_document
 
 ## Introduction
 
-The following libraries are commonly used for tasks like classification, regression, clustering, and model evaluation.
+The following libraries are commonly used for tasks like classification, regression, clustering, and model evaluation:
 
-library(randomForest)  # Random Forest
-library(caret)         # Classification and Regression Training
-library(rpart)         # Recursive Partitioning and Regression Trees
-library(class)         # K-Nearest Neighbors
-library(glmnet)        # Regularized Generalized Linear Models (Lasso/Ridge)
-library(caTools)       # Data Splitting and Performance Evaluation
-library(e1071)         # Support Vector Machines
-library(mclust)        # Model-Based Clustering
-library(reticulate)    # R-Python Interface
-library(adabag)        # AdaBoost and Bagging
+- `randomForest`: Random Forest
+- `caret`: Classification and Regression Training
+- `rpart`: Recursive Partitioning and Regression Trees
+- `class`: K-Nearest Neighbors
+- `glmnet`: Regularized Generalized Linear Models (Lasso/Ridge)
+- `caTools`: Data Splitting and Performance Evaluation
+- `e1071`: Support Vector Machines
+- `mclust`: Model-Based Clustering
+- `reticulate`: R-Python Interface
+- `adabag`: AdaBoost and Bagging
 
 ## Libraries
 
-installing and loading the required libraries:
+The following code installs and loads the required libraries if they are not already installed:
 
 ```{r setup, message=FALSE}
 # Function to install and load libraries
 install_if_missing <- function(pkg) {
   if (!require(pkg, character.only = TRUE)) {
+    message(paste("Installing package:", pkg))
     install.packages(pkg, dependencies = TRUE)
-    library(pkg, character.only = TRUE)
+    if (!require(pkg, character.only = TRUE)) {
+      message(paste("Failed to install:", pkg))
+      return(NULL)
+    }
+  } else {
+    message(paste("Package already installed:", pkg))
   }
+  return(pkg)  # Return the package name
 }
 
 # List of required libraries
 packages <- c("randomForest", "caret", "rpart", "class", "glmnet", "caTools",
               "e1071", "mclust", "reticulate", "adabag")
 
-# Install and load each package
-lapply(packages, install_if_missing)
+# Install and load each package, and capture results
+results <- lapply(packages, install_if_missing)
+print(results)  # Display results to ensure meaningful output

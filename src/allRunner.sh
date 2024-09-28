@@ -10,10 +10,20 @@ echo "Running MATLAB and Python scripts using allRunner.py..."
 python allRunner.py
 # add matlab env
 
-echo "Navigating to the R directory and running rRunner.py..."
+echo "Navigating to the R directory and setting up the R environment..."
 cd R
+
+# Check if Rmarkdown is installed and install it if missing
+echo "Checking if Rmarkdown is installed..."
+Rscript -e "if (!require('rmarkdown')) install.packages('rmarkdown', repos='http://cran.rstudio.com/')"
+
+# Rendering requirements.Rmd to install R packages and set up the R environment
+echo "Rendering requirements.Rmd to install required R packages..."
+Rscript -e "rmarkdown::render('requirements.Rmd')"
+
+echo "Running rRunner.py..."
 python3 rRunner.py
-# add r env
+
 cd ..
 
 echo "Navigating to the Java directory, building with Maven, and running jRunner.py..."

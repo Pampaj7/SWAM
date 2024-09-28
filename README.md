@@ -86,6 +86,7 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 2. [MATLAB](https://www.mathworks.com/products/matlab.html) (with **Statistics and Machine Learning Toolbox**)
 3. [Java SDK](https://www.oracle.com/java/technologies/javase-downloads.html)
 4. [R](https://cran.r-project.org/)
+   1. [pandoc](https://pandoc.org) (brew install pandoc, to handle conversion from .Rmd to html)
 5. [g++](https://gcc.gnu.org/) for C++
 
 ### Steps:
