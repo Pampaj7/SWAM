@@ -1,1 +1,3 @@
 brew install xgboost
+brew install mlpack
+brew install armadillo

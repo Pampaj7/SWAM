@@ -45,7 +45,7 @@ void TrainKnn(std::pair<arma::mat, arma::Row<size_t>> data) {
 
     // Create and configure the KNN model
     Ptr<KNearest> knn = KNearest::create();
-    knn->setDefaultK(3); // Set the number of neighbors to 3
+    knn->setDefaultK(5);
     knn->setIsClassifier(true);
 
     // Train the KNN model
