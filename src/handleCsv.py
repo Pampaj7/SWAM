@@ -2,7 +2,7 @@ import pandas as pd
 from utils import mean_unique_quadruplets, mean_group_by, saveCsv, plot, median_unique_quadruplets, retrive_data, \
     median_group_by, sum_metrics_per_language, sum_metrics_per_language_and_algorithm
 
-output_csv_name = 'meanEmissionsNew.csv'
+output_csv_name = 'meanEmissions.csv'
 columns = ["duration", "energy_consumed", "emissions", "emissions_rate", "cpu_power", "cpu_energy"]
 
 df = retrive_data(True)
@@ -43,6 +43,6 @@ saveCsv(group_by_dataset, "median_group_by_dataset.csv")
 dfsum = pd.read_csv("processedDatasets/mean_group_by_algorithm.csv")
 sumalgo = sum_metrics_per_language(dfsum)
 
-sumalgolang = sum_metrics_per_language_and_algorithm(pd.read_csv("processedDatasets/meanEmissionsNew.csv"))
+sumalgolang = sum_metrics_per_language_and_algorithm(pd.read_csv("processedDatasets/meanEmissions.csv"))
 
 sumalgolang.to_csv("processedDatasets/sum_metrics_per_language_and_algo.csv")
