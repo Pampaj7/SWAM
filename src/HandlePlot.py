@@ -445,17 +445,17 @@ df = load_dataset('processedDatasets/meanEmissions.csv')
 df_raw = load_dataset('raw_merged_emissions.csv')
 df_clean = remove_outliers(df)
 
-"""plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_energy', 'phase', 'test',
+plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_energy', 'phase', 'test',
                                               title="CPU energy distribution by language and algorithm (Test)",
                                               excluded_language='None')
 
 plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_energy', 'phase', 'train',
                                               title="CPU energy distribution by language and algorithm (Train)",
                                               excluded_language='None')
-"""
+
 plot_performance_heatmap(df, 'language', 'algorithm', 'duration', 'phase', )
 
-"""plot_execution_time_by_dataset(df, 'dataset', 'emissions', 'language')
+plot_execution_time_by_dataset(df, 'dataset', 'emissions', 'language')
 
 plot_correlation_by_phase(df, 'cpu_energy', 'emissions', 'phase', 'language',
                           title_prefix="Correlation_by_Phase_emissions")
@@ -480,4 +480,4 @@ plot_execution_time_by_language(df, 'language', 'algorithm', 'cpu_energy', 'phas
 
 
 
-plot_time_series_all_algorithms(df_raw, 'cpp', 'timestamp', 'emissions')"""
+plot_time_series_all_algorithms(df_raw, 'cpp', 'timestamp', 'emissions')
