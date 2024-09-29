@@ -36,7 +36,7 @@ calls.
 ---
 
 ## Languages and Algorithms
- 
+
 ### Supported Languages:
 
 - Python
@@ -72,12 +72,12 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 
 ---
 
-
 ---
 
 ## Installation
 
 ### Prerequisites:
+
 1. [Conda](https://docs.conda.io/en/latest/miniconda.html) (for managing environments)
 2. [MATLAB](https://www.mathworks.com/products/matlab.html) (with **Statistics and Machine Learning Toolbox**)
 3. [Java SDK](https://www.oracle.com/java/technologies/javase-downloads.html)
@@ -89,20 +89,21 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/ml-efficiency-project.git
-   cd ml-efficiency-project
-
+   git clone https://github.com/Pampaj7/SWAM.git
+   cd SWAM
+   ```
 
 ## Usage
 
-1. Navigate to the src directory of the project using your terminal:
+0. You need to change the python paths on all the languages, since we're calling python from within each language you need to link paths of your python installation
+1. Ensure you have created conda environments named like the one in the allRunner.sh
+2. Navigate to the src directory of the project using your terminal:
    1. `cd ../SWAM/src`
-2. Run the execution script: 
+3. Run the execution script:
    1. `./allRunner.sh`
-3. Ensure that all prerequisites are met. If so, the program will begin executing.
-4. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `src` folder, containing:
+4. Ensure that all prerequisites are met. If so, the program will begin executing.
+5. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `src` folder, containing:
    1. 30 rows for each unique combination of dataset, algorithm, programming language, and phase (training or testing).
-   
 
 ## Result
 
@@ -112,3 +113,4 @@ Additionally, the processedDataset folder will contain all the datasets used to 
 ## Paper
 
 For further informations, please check the `swam.pdf` in the GitHub repository
+
