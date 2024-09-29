@@ -41,7 +41,11 @@ echo "Running C++ related scripts with cRunner.py..."
 python cRunner.py
 # sorry this will most likely not run 
 
-cd ../
+cd ..
+
+echo "Creating raw_merged_emission.csv..."
+python -c "from utils import retrieve_data; retrieve_data(True)"
+
 
 echo "Creating Plots!"
 

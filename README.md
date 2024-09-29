@@ -13,12 +13,8 @@ speed, accuracy, and environmental impact across languages and algorithms.
 - [Datasets](#datasets)
 - [Installation](#installation)
 - [Usage](#usage)
-    - [Run All Experiments](#run-all-experiments)
-    - [Run Individual Experiments](#run-individual-experiments)
-- [Tracking Emissions](#tracking-emissions)
 - [Results](#results)
-- [Contributing](#contributing)
-- [License](#license)
+- [Paper](#Paper)
 
 ---
 
@@ -95,3 +91,24 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
    ```bash
    git clone https://github.com/your-username/ml-efficiency-project.git
    cd ml-efficiency-project
+
+
+## Usage
+
+1. Navigate to the src directory of the project using your terminal:
+   1. `cd ../SWAM/src`
+2. Run the execution script: 
+   1. `./allRunner.sh`
+3. Ensure that all prerequisites are met. If so, the program will begin executing.
+4. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `src` folder, containing:
+   1. 30 rows for each unique combination of dataset, algorithm, programming language, and phase (training or testing).
+   
+
+## Result
+
+After the program completes its execution, you will find all the generated plots in the graphics folder.
+Additionally, the processedDataset folder will contain all the datasets used to create those plots.
+
+## Paper
+
+For further informations, please check the `swam.pdf` in the GitHub repository
