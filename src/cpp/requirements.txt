@@ -1,3 +1,25 @@
 brew install xgboost
 brew install mlpack
 brew install armadillo
+You might need to change the libraries paths in the CmakeLists.txt file in the project to the path where the libraries are installed in your system.
+If you're on macos arm you also need to change the armadillo conf so that it avoids using lapack and blas (as of now they are not working with arm macos)
+assuming you installed armadillo with brew
+cd /opt/homebrew/Ce/arm/1/i/armadillo_bits 
+code vim or nano config.hpp
+you need to comment out this lines
+
+// #if !defined(ARMA_USE_LAPACK)
+// #define ARMA_USE_LAPACK
+//// Comment out the above line if you don't have LAPACK or a high-speed
+/// replacement for LAPACK, / such as OpenBLAS, Intel MKL, or the Accelerate
+/// framework. / LAPACK is required for matrix decompositions (eg. SVD) and
+/// matrix inverse.
+// #endif
+
+// #if !defined(ARMA_USE_BLAS)
+// #define ARMA_USE_BLAS
+//// Comment out the above line if you don't have BLAS or a high-speed
+/// replacement for BLAS, / such as OpenBLAS, Intel MKL, or the Accelerate
+/// framework. / BLAS is used for matrix multiplication. / Without BLAS, matrix
+/// multiplication will still work, but might be slower.
+// #endif

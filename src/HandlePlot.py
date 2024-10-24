@@ -17,17 +17,30 @@ def plot_execution_time_by_language_and_algorithm(df, language_col, algorithm_co
     if excluded_language:
         df = df[df[language_col] != excluded_language]
     filtered_df = df[df[type_col] == type_value]
-    grouped_data = filtered_df.groupby([language_col, algorithm_col])[time_col].sum().unstack()
-    grouped_data['total'] = grouped_data.sum(axis=1)
-    grouped_data = grouped_data.sort_values(by='total', ascending=True)
-    grouped_data = grouped_data.drop(columns='total')
-    grouped_data.plot(kind='bar', stacked=True, colormap='tab20', figsize=(12, 8))
-    plt.title(title)
+
+    # Group and pivot the data
+    grouped_data = filtered_df.groupby([algorithm_col, language_col])[time_col].sum().unstack(fill_value=0)
+
+    # Create a side-by-side bar plot
+    ax = grouped_data.plot(kind='bar', figsize=(14, 8), colormap='tab20', width=0.8, fontsize=14)
+    plt.legend(title='Languages', fontsize=18, title_fontsize=20)  # Legend font size increased
+
+    # Set title and labels
+    plt.title(title, fontsize=20)
+    plt.xlabel('Algorithms', fontsize=20)
+    plt.ylabel('Energy consumed (Joules)', fontsize=20)
+    plt.xticks(rotation=15)
+    plt.subplots_adjust(bottom=0.15)  # Adjust this value as needed
+    # Customize y-axis with scientific notation
     plt.ticklabel_format(style='scientific', axis='y', scilimits=(0, 0))
-    plt.xlabel('Language')
+
+    # Add grid
     plt.grid(True)
-    plt.ylabel('CPU Energy (Joules)')
-    plt.savefig("graphics/" + title)
+
+    # Save the plot as an image file
+    plt.savefig(f"graphics/{title}.png", bbox_inches='tight')
+
+    # Show the plot
     plt.show()
 
 
@@ -67,36 +80,40 @@ def plot_duration_by_algorithm_and_dataset(df, algorithm_col, duration_col, data
     plt.show()
 
 
-def plot_performance_heatmap(df, language_col, algorithm_col, duration_col,
-                             title="Heatmap_delle_Performance_per_Linguaggio_e_Algoritmo"):
-    # Create figure and axes with vertical subplots
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 16), sharex=True, sharey=True)
-
-    for ax, phase in zip(axes, ['train', 'test']):
+def plot_performance_heatmap(df, language_col, algorithm_col, col):
+    for phase in ['train', 'test']:
+        title = "Heatmap_delle_Performance_per_Linguaggio_e_Algoritmo_fase_" + phase
         # Filter for the phase
         phase_df = df[df['phase'] == phase]
 
+        plt.figure(figsize=(14, 10))
+
         # Pivot table for heatmap
-        pivot_table = phase_df.pivot_table(values=duration_col, index=algorithm_col, columns=language_col,
+        pivot_table = phase_df.pivot_table(values=col, index=algorithm_col, columns=language_col,
                                            aggfunc='mean')
-        pivot_table *= 1000  # Convert seconds to milliseconds
-
-
-
-        #pivot_table_log = np.log10(pivot_table)
 
         # Plot heatmap
-        sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="viridis", ax=ax,
-                    cbar_kws={'label': 'Milliseconds'})
+        ax = sns.heatmap(pivot_table, annot=True, fmt=".1e", cmap="viridis",
+                         cbar_kws={'label': 'Energy consumed (Joules)'}, annot_kws={"size": 20})
 
         # Customize the axis
-        ax.set_title(f"Performance Heatmap for Phase: {phase}")
-        ax.set_xlabel('Languages')
-        ax.set_ylabel('Algorithms')
+        ax.tick_params(axis='both', which='major', labelsize=16)
 
-    plt.tight_layout()
+        ax.set_title(f"Performance Heatmap for Phase: {phase}", fontsize=20)
+        ax.set_xlabel('Languages', fontsize=20)
+        ax.set_ylabel('Algorithms', fontsize=20)
+        ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=18)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=0, fontsize=18)
+
+        # Increase font size for the color bar
+        colorbar = ax.collections[0].colorbar
+        colorbar.ax.tick_params(labelsize=20)  # Change font size of the tick labels on color bar
+        colorbar.set_label('Energy consumed (Joules)', fontsize=20)  # Change font size of the color bar label
+
+        plt.subplots_adjust(left=0.25)  # Adjust this value as needed
+        plt.savefig(f"graphics/{title}_log.png")
+
     # Save the plot as an image file
-    plt.savefig(f"graphics/{title}_log.png")
 
     # Show the plot
     plt.show()
@@ -253,7 +270,8 @@ def plot_time_series(df, language, dataset, algorithm, date_col, value_col, phas
     plt.show()
 
 
-def plot_time_series_all_algorithms(df, language, date_col, value_col, phase_col='phase', phase='train', dataset="breastCancer"):
+def plot_time_series_all_algorithms(df, language, date_col, value_col, phase_col='phase', phase='train',
+                                    dataset="breastCancer"):
     """
     Plot time series data for all algorithms for a specific language and dataset in a given phase.
 
@@ -445,17 +463,17 @@ df = load_dataset('processedDatasets/meanEmissions.csv')
 df_raw = load_dataset('raw_merged_emissions.csv')
 df_clean = remove_outliers(df)
 
-"""plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_energy', 'phase', 'test',
-                                              title="CPU energy distribution by language and algorithm (Test)",
+plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'energy_consumed', 'phase', 'test',
+                                              title="Energy consumed by language and algorithm (Test)",
                                               excluded_language='None')
 
-plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'cpu_energy', 'phase', 'train',
-                                              title="CPU energy distribution by language and algorithm (Train)",
+plot_execution_time_by_language_and_algorithm(df, 'language', 'algorithm', 'energy_consumed', 'phase', 'train',
+                                              title="Energy consumed by language and algorithm (Train)",
                                               excluded_language='None')
+
+plot_performance_heatmap(df, 'language', 'algorithm', 'energy_consumed')
 """
-plot_performance_heatmap(df, 'language', 'algorithm', 'duration', 'phase', )
-
-"""plot_execution_time_by_dataset(df, 'dataset', 'emissions', 'language')
+plot_execution_time_by_dataset(df, 'dataset', 'emissions', 'language')
 
 plot_correlation_by_phase(df, 'cpu_energy', 'emissions', 'phase', 'language',
                           title_prefix="Correlation_by_Phase_emissions")
@@ -480,4 +498,5 @@ plot_execution_time_by_language(df, 'language', 'algorithm', 'cpu_energy', 'phas
 
 
 
-plot_time_series_all_algorithms(df_raw, 'cpp', 'timestamp', 'emissions')"""
+plot_time_series_all_algorithms(df_raw, 'cpp', 'timestamp', 'emissions')
+"""
