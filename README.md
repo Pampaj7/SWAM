@@ -14,7 +14,6 @@ speed, accuracy, and environmental impact across languages and algorithms.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Results](#results)
-- [Paper](#Paper)
 
 ---
 
@@ -108,7 +107,3 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 
 After the program completes its execution, you will find all the generated plots in the graphics folder.
 Additionally, the processedDataset folder will contain all the datasets used to create those plots.
-
-## Paper
-
-For further informations, please check the `swam.pdf` in the GitHub repository
