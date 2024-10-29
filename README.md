@@ -1,8 +1,8 @@
-# Machine Learning Efficiency Project
+# Energy, Emissions and Performance: Cross-Language and Cross-Algorithm Analysis in Machine Learning
 
-This project evaluates the efficiency of machine learning algorithms implemented in various programming languages by
-tracking energy consumption, CO2 emissions, and performance metrics. The goal is to understand the trade-offs between
-speed, accuracy, and environmental impact across languages and algorithms.
+This repository is a companion page for the following research, submitted for revision at the 9th International Workshop on Green and Sustainable Software (GREENS’25)
+
+> Authors Blinded for Review. 2025. Energy, Emissions and Performance: Cross-Language and Cross-Algorithm Analysis in Machine Learning.Submitted for revision at the 9th International Workshop on Green and Sustainable Software (GREENS’25)
 
 ---
 
@@ -44,7 +44,7 @@ calls.
 - R
 - Java
 - C++
-- (Future) Rust, Go, Julia, Scala, Swift, Fortran
+<!-- - (Future) Rust, Go, Julia, Scala, Swift, Fortran -->
 
 ### Algorithms Implemented:
 
@@ -74,7 +74,7 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 
 ---
 
-## Installation
+## Quick Start
 
 ### Prerequisites:
 
@@ -102,7 +102,7 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 3. Run the execution script:
    1. `./allRunner.sh`
 4. Ensure that all prerequisites are met. If so, the program will begin executing. If not cd into specific language folder and make sure you have the dependencies installed, some languages like cpp require system level libraries
-5. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `src` folder, containing:
+5. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `datasets` folder, containing:
    1. 30 rows for each unique combination of dataset, algorithm, programming language, and phase (training or testing).
 
 ## Result
@@ -110,6 +110,25 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 After the program completes its execution, you will find all the generated plots in the graphics folder.
 Additionally, the processedDataset folder will contain all the datasets used to create those plots.
 
-## Paper
+## Repository Structure
 
-For further informations, please check the `swam.pdf` in the GitHub repository
+This is the root directory of the repository. The directory is structured as follows:
+
+    .
+    ├── README.md
+    ├── data
+    │   └── mean_emissions.csv          Final experimental results data
+    ├── plots
+    │   ├── qqplot-energy.pdf            QQ-plot of energy measurements distribution
+    │   ├── qqplot-f1.pdf                QQ-plot of F1-scores distribution
+    │   ├── rq1.pdf                      RQ1 plot
+    │   ├── rq2.pdf                      RQ2 plot
+    │   └── rq3.pdf                      RQ3 plot
+    ├── requirements.txt
+    └── src
+        ├── cpp                         Folder containing cpp files
+        ├── java                        Folder containing java files
+        ├── matlab                      Folder containing matlab files
+        ├── processedDataset            Folder containing processedDataset files
+        ├── python                      Folder containing python files
+        └── Utils                       Folder containing a .py used to preprocess the datasets
