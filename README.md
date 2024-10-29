@@ -102,13 +102,13 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 3. Run the execution script:
    1. `./allRunner.sh`
 4. Ensure that all prerequisites are met. If so, the program will begin executing. If not cd into specific language folder and make sure you have the dependencies installed, some languages like cpp require system level libraries
-5. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `datasets` folder, containing:
+5. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `data` folder, containing:
    1. 30 rows for each unique combination of dataset, algorithm, programming language, and phase (training or testing).
 
 ## Result
 
 After the program completes its execution, you will find all the generated plots in the graphics folder.
-Additionally, the processedDataset folder will contain all the datasets used to create those plots.
+Additionally, the data folder will contain all the datasets used to create those plots.
 
 ## Repository Structure
 
