@@ -95,7 +95,7 @@ def run_algorithms(X, y, dataset_name):
 
 
 def breastCancerAlgos():
-    csv_file_path = "../datasets/breastcancer/breastCancer_processed.csv"
+    csv_file_path = "./datasets/breastcancer/breastCancer_processed.csv"
     data = pd.read_csv(csv_file_path)
 
     X = data.drop(columns=["target"])
@@ -105,7 +105,7 @@ def breastCancerAlgos():
 
 
 def irisAlgos():
-    csv_file_path = "../datasets/iris/iris_processed.csv"
+    csv_file_path = "./datasets/iris/iris_processed.csv"
     data = pd.read_csv(csv_file_path, header=0)
 
     X = data.drop("target", axis=1)
@@ -115,7 +115,7 @@ def irisAlgos():
 
 
 def wineQualityAlgos():
-    wine_data = pd.read_csv("../datasets/winequality/wineQuality_processed.csv")
+    wine_data = pd.read_csv("./datasets/winequality/wineQuality_processed.csv")
 
     X = wine_data.drop("target", axis=1)
     y = wine_data["target"]
