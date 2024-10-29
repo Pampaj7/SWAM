@@ -54,7 +54,7 @@ def plot_execution_time_by_language_and_algorithm(
     plt.grid(True)
 
     # Save the plot as an image file
-    plt.savefig(f"graphics/{title}.png", bbox_inches="tight")
+    plt.savefig(f"../plots/{title}.png", bbox_inches="tight")
 
     # Show the plot
     plt.show()
@@ -81,7 +81,7 @@ def plot_duration_vs_emissions(
     plt.title("Duration vs Emissions (Outlier Removed)")
     plt.xlabel("CPU Energy (Joules)")
     plt.ylabel("Emissions KG(CO₂)")
-    plt.savefig("graphics/" + title)
+    plt.savefig("../plots/" + title)
     plt.show()
 
 
@@ -109,7 +109,7 @@ def plot_duration_by_algorithm_and_dataset(
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.grid(True)
-    plt.savefig("graphics/" + title)
+    plt.savefig("../plots/" + title)
     plt.show()
 
 
@@ -155,7 +155,7 @@ def plot_performance_heatmap(df, language_col, algorithm_col, col):
         )  # Change font size of the color bar label
 
         plt.subplots_adjust(left=0.25)  # Adjust this value as needed
-        plt.savefig(f"graphics/{title}_log.png")
+        plt.savefig(f"../plots/{title}_log.png")
 
     # Save the plot as an image file
 
@@ -174,7 +174,7 @@ def plot_execution_time_by_dataset(
     plt.xticks(rotation=45)
     plt.grid(True)
     plt.ylabel("Total Execution Time(s)")
-    plt.savefig("graphics/" + title)
+    plt.savefig("../plots/" + title)
     plt.show()
 
 
@@ -271,7 +271,7 @@ def plot_correlation_by_phase(
 
     fig.tight_layout()
     plt.legend(title=language_col, bbox_to_anchor=(1.05, 1), loc="upper left")
-    plt.savefig(f"graphics/{title_prefix}_Train_vs_Test.png")
+    plt.savefig(f"../plots/{title_prefix}_Train_vs_Test.png")
     plt.show()
 
 
@@ -300,7 +300,7 @@ def plot_emissions_by_algorithm(
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.grid(True)
-    plt.savefig("graphics/" + title)
+    plt.savefig("../plots/" + title)
     plt.show()
 
 
@@ -367,7 +367,7 @@ def plot_time_series(
     plt.tight_layout()
 
     # Save the plot as an image file
-    plt.savefig(f"graphics/{algorithm}_emissions_time_series_{language}_{dataset}.png")
+    plt.savefig(f"../plots/{algorithm}_emissions_time_series_{language}_{dataset}.png")
 
     # Show the plot
     plt.show()
@@ -462,7 +462,7 @@ def plot_time_series_all_algorithms(
     plt.tight_layout()
 
     # Save the plot as an image file
-    plt.savefig(f"graphics/emissions_time_series_{language}_{dataset}_{phase}.png")
+    plt.savefig(f"../plots/emissions_time_series_{language}_{dataset}_{phase}.png")
 
     # Show the plot
     plt.show()
@@ -508,7 +508,7 @@ def plot_execution_time_by_language(
     plt.tight_layout()
 
     # Save the plot as an image file
-    plt.savefig(f"graphics/{title}_{selected_algorithm}.png")
+    plt.savefig(f"../plots/{title}_{selected_algorithm}.png")
 
     # Show the plot
     plt.show()
@@ -598,7 +598,7 @@ def plot_time_series_subplot(df, combinations, date_col, value_col, phase_col="p
     plt.xticks(rotation=45)
 
     # Save the plot as an image file
-    plt.savefig(f"graphics/time_series_subplot.png")
+    plt.savefig(f"../plots/time_series_subplot.png")
     plt.show()
 
 
