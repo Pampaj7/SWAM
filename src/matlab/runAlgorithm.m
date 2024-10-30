@@ -5,17 +5,17 @@ function runAlgo(algorithm, dataset)
 
     switch dataset
         case 'breastCancer'
-            data = readtable('../datasets/breastcancer/breastCancer_processed.csv');
+            data = readtable('./datasets/breastcancer/breastCancer_processed.csv');
             %disp(data.Properties.VariableNames);
             %displayed in Var..
             X = data{:, setdiff(data.Properties.VariableNames, {'Var31'})};  % Estrai tutte le colonne tranne 'target'
             y = data.Var31;
         case 'wine'
-            data = readtable('../datasets/winequality/wineQuality_processed.csv', 'ReadVariableNames', false);
+            data = readtable('./datasets/winequality/wineQuality_processed.csv', 'ReadVariableNames', false);
             X = data{:, setdiff(data.Properties.VariableNames, {'Var13'})};
             y = data.Var13;
         case 'iris'
-            data = readtable('../datasets/iris/iris_processed.csv', 'ReadVariableNames', false);
+            data = readtable('./datasets/iris/iris_processed.csv', 'ReadVariableNames', false);
             X = data{:, setdiff(data.Properties.VariableNames, {'Var5'})};
             y = data.Var5;
         otherwise

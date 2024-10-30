@@ -32,11 +32,11 @@ public class loader {
   private static String getFilePath(String datasetName) {
     switch (datasetName.toLowerCase()) {
       case "breast_cancer":
-        return "../../datasets/breastcancer/breastCancer_processed.csv";
+        return "../datasets/breastcancer/breastCancer_processed.csv";
       case "iris":
-        return "../../datasets/iris/iris_processed.csv";
+        return "../datasets/iris/iris_processed.csv";
       case "winequality":
-        return "../../datasets/winequality/wineQuality_processed.csv";
+        return "../datasets/winequality/wineQuality_processed.csv";
       default:
         return null;
     }

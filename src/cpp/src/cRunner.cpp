@@ -29,14 +29,14 @@ struct DatasetInfo {
 // Define a mapping for datasets
 const std::unordered_map<std::string, DatasetInfo> datasetMap = {
     {"breastCancer",
-     {"../../datasets/breastcancer/breastCancer_processed.csv"}},
+     {"../datasets/breastcancer/breastCancer_processed.csv"}},
     {"iris",
      {
-         "../../datasets/iris/iris_processed.csv",
+         "../datasets/iris/iris_processed.csv",
      }},
     {"wine",
      {
-         "../../datasets/winequality/wineQuality_processed.csv",
+         "../datasets/winequality/wineQuality_processed.csv",
      }}};
 
 // Function to load dataset based on string identifier

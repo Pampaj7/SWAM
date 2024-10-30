@@ -14,9 +14,9 @@ library(adabag)
 use_python('/opt/homebrew/Caskroom/miniforge/base/envs/swam/bin/python', required = TRUE)
 source_python("../matlab/tracker_control.py")
 
-dataIris <- read.csv("../../datasets/iris/iris_processed.csv")
-dataBreastCancer <- read.csv("../../datasets/breastcancer/breastCancer_processed.csv")
-dataWine <- read.csv("../../datasets/winequality/wineQuality_processed.csv")
+dataIris <- read.csv("../datasets/iris/iris_processed.csv")
+dataBreastCancer <- read.csv("../datasets/breastcancer/breastCancer_processed.csv")
+dataWine <- read.csv("../datasets/winequality/wineQuality_processed.csv")
 
 
 
