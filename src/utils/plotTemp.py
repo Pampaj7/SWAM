@@ -37,11 +37,21 @@ print(np.round(energy_percentage, 2))
 
 # Plot heatmap with annotations
 plt.figure(figsize=(10, 7))
-ax = sns.heatmap(energy_percentage, annot=True, cmap="YlGnBu", fmt=".2f", cbar_kws={'label': 'Percentage'})
+
+ax = sns.heatmap(energy_percentage, annot=True, cmap="YlGnBu", fmt=".2f", cbar_kws={'label': 'Percentage'}, annot_kws={"size": 20})
+# Increase font size for the color bar
+colorbar = ax.collections[0].colorbar
+colorbar.ax.tick_params(labelsize=20)  # Change font size of the tick labels on color bar
+colorbar.set_label('Percentage of energy', fontsize=20)  # Change font size of the color bar label
+
 
 # Adding labels
+ax.tick_params(axis='both', which='major', labelsize=16)
 ax.set_xticklabels(['Python', 'R', 'Matlab', 'Java', 'C++'])
 ax.set_yticklabels(['KNN', 'SVC', 'AdaBoost', 'DecisionTree', 'LogReg', 'NaiveBayes', 'RandomForest'], rotation=0)
+
+
+plt.subplots_adjust(left=0.2, right=0.95, top=0.9, bottom=0.1)
 
 # Display the plot
 plt.title('Energy Consumption as Percentage per Algorithm and Language')
