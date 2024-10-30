@@ -118,12 +118,7 @@ This is the root directory of the repository. The directory is structured as fol
     ├── README.md
     ├── data
     │   └── mean_emissions.csv          Final experimental results data
-    ├── plots
-    │   ├── qqplot-energy.pdf            QQ-plot of energy measurements distribution
-    │   ├── qqplot-f1.pdf                QQ-plot of F1-scores distribution
-    │   ├── rq1.pdf                      RQ1 plot
-    │   ├── rq2.pdf                      RQ2 plot
-    │   └── rq3.pdf                      RQ3 plot
+    ├── plots                           Folder Containing plots
     ├── requirements.txt
     └── src
         ├── cpp                         Folder containing cpp files
