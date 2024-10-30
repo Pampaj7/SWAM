@@ -14,7 +14,6 @@ This repository is a companion page for the following research, submitted for re
 - [Installation](#installation)
 - [Usage](#usage)
 - [Results](#results)
-- [Paper](#Paper)
 
 ---
 
@@ -86,7 +85,7 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 5. [g++](https://gcc.gnu.org/) for C++ or(gcc or whatever you need to run cpp on your system)
 
 ### Steps:
-
+0. **Make sure you installed the Prerequisites**
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Pampaj7/SWAM.git
@@ -95,12 +94,19 @@ Each dataset has been preprocessed and saved as CSV files located in the `datase
 
 ## Usage
 
-0. You need to change the python paths on all the languages, since we're calling python from within each language you need to link paths of your python installation
-1. Ensure you have created conda environments named like the one in the allRunner.sh
+0. You must change the python paths on all the languages:
+   1. run `which python` on the terminal and copy that path
+      * `rRunner.R put` your path in `use_python()`  
+      * `runAlgorithm.m` put your path in `pyenv()`
+      * `PythonHandler.java` put your path in the first parameter of `new ProcessBuilder()`
+      * `pythonLinker.cpp` put your path in `add_to_sys_path_py()`
+      * `` ``
+1. Ensure you have created conda environments named `cpp` and `sw`; see `allRunner.sh` for more info
 2. Navigate to the src directory of the project using your terminal:
    1. `cd ../SWAM/src`
 3. Run the execution script:
    1. `./allRunner.sh`
+   * *note:* this step requires a long time because it runs 30 measures for all the combinations. If you want to speed up the process you can change the number of measures, or if you want to skip this step you can copy our measurements.
 4. Ensure that all prerequisites are met. If so, the program will begin executing. If not cd into specific language folder and make sure you have the dependencies installed, some languages like cpp require system level libraries
 5. Upon completion, a file named `raw_merged_emissions.csv` will be generated in the `data` folder, containing:
    1. 30 rows for each unique combination of dataset, algorithm, programming language, and phase (training or testing).
@@ -126,4 +132,5 @@ This is the root directory of the repository. The directory is structured as fol
         ├── matlab                      Folder containing matlab files
         ├── processedDataset            Folder containing processedDataset files
         ├── python                      Folder containing python files
+        ├── R                           Folder containing R files
         └── Utils                       Folder containing a .py used to preprocess the datasets
