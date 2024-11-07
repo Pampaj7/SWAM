@@ -13,14 +13,14 @@ def load_dataset(file_path):
 
 
 def plot_execution_time_by_language_and_algorithm(
-    df,
-    language_col,
-    algorithm_col,
-    time_col,
-    type_col,
-    type_value,
-    title,
-    excluded_language,
+        df,
+        language_col,
+        algorithm_col,
+        time_col,
+        type_col,
+        type_value,
+        title,
+        excluded_language,
 ):
     if excluded_language:
         df = df[df[language_col] != excluded_language]
@@ -61,7 +61,7 @@ def plot_execution_time_by_language_and_algorithm(
 
 
 def plot_duration_vs_emissions(
-    df, duration_col, co2_col, title="Durata_vs_Emissioni_di_CO₂"
+        df, duration_col, co2_col, title="Durata_vs_Emissioni_di_CO₂"
 ):
     # Calcolo dei quartili
     Q1 = df[co2_col].quantile(0.25)
@@ -86,11 +86,11 @@ def plot_duration_vs_emissions(
 
 
 def plot_duration_by_algorithm_and_dataset(
-    df,
-    algorithm_col,
-    duration_col,
-    dataset_col,
-    title="Durata_per_Algoritmo_diviso_per_Dataset",
+        df,
+        algorithm_col,
+        duration_col,
+        dataset_col,
+        title="Durata_per_Algoritmo_diviso_per_Dataset",
 ):
     plt.figure(figsize=(14, 8))
     palette = sns.color_palette("tab20", n_colors=df[dataset_col].nunique())
@@ -164,7 +164,7 @@ def plot_performance_heatmap(df, language_col, algorithm_col, col):
 
 
 def plot_execution_time_by_dataset(
-    df, dataset_col, time_col, language_col, title="Execution_Time_by_Dataset"
+        df, dataset_col, time_col, language_col, title="Execution_Time_by_Dataset"
 ):
     plt.figure(figsize=(12, 8))
     grouped_data = df.groupby([dataset_col, language_col])[time_col].sum().unstack()
@@ -179,12 +179,12 @@ def plot_execution_time_by_dataset(
 
 
 def plot_correlation_by_phase(
-    df,
-    cpu_energy_col,
-    emissions_col,
-    phase_col,
-    language_col,
-    title_prefix="Correlation_by_Phase",
+        df,
+        cpu_energy_col,
+        emissions_col,
+        phase_col,
+        language_col,
+        title_prefix="Correlation_by_Phase",
 ):
     phases = df[phase_col].unique()
 
@@ -286,7 +286,7 @@ def remove_outliers(df, threshold=3):
 
 
 def plot_emissions_by_algorithm(
-    df, algorithm_col, emissions_col, title="Emissions_by_Algorithm"
+        df, algorithm_col, emissions_col, title="Emissions_by_Algorithm"
 ):
     # Calcolo delle emissioni medie per algoritmo
     emissions_summary = df.groupby(algorithm_col)[emissions_col].mean().sort_values()
@@ -304,25 +304,32 @@ def plot_emissions_by_algorithm(
     plt.show()
 
 
-def plot_time_series(
-    df, language, dataset, algorithm, date_col, value_col, phase_col="phase"
-):
-    # Filter the DataFrame based on selected language, dataset, and algorithm
-    df_filtered = df[
-        (df["language"] == language)
-        & (df["dataset"] == dataset)
-        & (df["algorithm"] == algorithm)
-    ].copy()  # Create a copy to avoid SettingWithCopyWarning
+def plot_time_series_all_algorithms(df, language, date_col, value_col, phase_col='phase', phase='train',
+                                    dataset="breastCancer"):
+    """
+    Plot time series data for all algorithms for a specific language and dataset in a given phase.
+
+    Parameters:
+    - df: DataFrame containing the data
+    - language: The programming language to filter
+    - dataset: The dataset to filter
+    - date_col: Column name for date/time
+    - value_col: Column name for the values to plot
+    - phase_col: Column name for phase (optional, default is 'phase')
+    - phase: Phase to filter (optional, default is 'test')
+    """
+    # Filter the DataFrame based on the selected language, dataset, and phase
+    df_filtered = df[(df['language'] == language) &
+                     (df['dataset'] == dataset) &
+                     (df[phase_col] == phase)].copy()  # Create a copy to avoid SettingWithCopyWarning
 
     # Check if filtering resulted in non-empty DataFrame
     if df_filtered.empty:
-        print(
-            f"No data available for language: {language}, dataset: {dataset}, algorithm: {algorithm}"
-        )
+        print(f"No data available for language: {language}, dataset: {dataset} in phase: {phase}")
         return
 
     # Convert the timestamp column to datetime
-    df_filtered[date_col] = pd.to_datetime(df_filtered[date_col], errors="coerce")
+    df_filtered[date_col] = pd.to_datetime(df_filtered[date_col], errors='coerce')
 
     # Check for any conversion errors or NaT values
     if df_filtered[date_col].isna().any():
@@ -332,7 +339,7 @@ def plot_time_series(
     df_filtered = df_filtered.dropna(subset=[date_col])
 
     # Ensure the value column contains numeric data
-    df_filtered[value_col] = pd.to_numeric(df_filtered[value_col], errors="coerce")
+    df_filtered[value_col] = pd.to_numeric(df_filtered[value_col], errors='coerce')
 
     # Drop rows with invalid or missing values in the value column
     df_filtered = df_filtered.dropna(subset=[value_col])
@@ -345,42 +352,42 @@ def plot_time_series(
     # Plot the time series
     plt.figure(figsize=(14, 8))
 
-    # Separate the data into train and test phases
-    # Separate the data into train and test phases
-    for phase in df_filtered[phase_col].unique():
-        df_phase = df_filtered[df_filtered[phase_col] == phase]
+    # Get unique algorithms
+    algorithms = df_filtered['algorithm'].unique()
 
-        plt.plot(
-            df_phase[date_col],
-            df_phase[value_col],
-            marker="o",
-            linestyle="-",
-            label=f"{phase} phase",
-        )
+    # Generate a color palette for the algorithms
+    palette = sns.color_palette("tab20", n_colors=len(algorithms))
 
-    plt.title(f"Emissions Over Time for {algorithm} in {language} on Dataset {dataset}")
-    plt.xlabel("Date")
-    plt.ylabel("Emissions (kg CO2)")
+    # Plot each algorithm
+    for algorithm, color in zip(algorithms, palette):
+        df_algo = df_filtered[df_filtered['algorithm'] == algorithm]
+
+        plt.plot(df_algo[date_col], df_algo[value_col], marker='o', linestyle='-', color=color,
+                 label=f'{algorithm}')
+
+    plt.title(f'Emissions Over Time for All Algorithms in {language} on Dataset {dataset} (Phase: {phase})')
+    plt.xlabel('Date')
+    plt.ylabel('Emissions (kg CO2)')
     plt.grid(True)
     plt.xticks(rotation=45)
-    plt.legend(title="Phase")
+    plt.legend(title='Algorithm')
     plt.tight_layout()
 
     # Save the plot as an image file
-    plt.savefig(f"../plots/{algorithm}_emissions_time_series_{language}_{dataset}.png")
+    plt.savefig(f'graphics/emissions_time_series_{language}_{dataset}_{phase}.png')
 
     # Show the plot
     plt.show()
 
 
 def plot_time_series_all_algorithms(
-    df,
-    language,
-    date_col,
-    value_col,
-    phase_col="phase",
-    phase="train",
-    dataset="breastCancer",
+        df,
+        language,
+        date_col,
+        value_col,
+        phase_col="phase",
+        phase="train",
+        dataset="wine",
 ):
     """
     Plot time series data for all algorithms for a specific language and dataset in a given phase.
@@ -399,7 +406,7 @@ def plot_time_series_all_algorithms(
         (df["language"] == language)
         & (df["dataset"] == dataset)
         & (df[phase_col] == phase)
-    ].copy()  # Create a copy to avoid SettingWithCopyWarning
+        ].copy()  # Create a copy to avoid SettingWithCopyWarning
 
     # Check if filtering resulted in non-empty DataFrame
     if df_filtered.empty:
@@ -455,11 +462,12 @@ def plot_time_series_all_algorithms(
         f"Emissions Over Time for All Algorithms in {language} on Dataset {dataset} (Phase: {phase})"
     )
     plt.xlabel("Date")
-    plt.ylabel("Emissions (kg CO2)")
+    plt.ylabel("Energy consumed (Joules)")
     plt.grid(True)
     plt.xticks(rotation=45)
     plt.legend(title="Algorithm")
     plt.tight_layout()
+    plt.legend(title="Algorithm", fontsize=14, title_fontsize=16)
 
     # Save the plot as an image file
     plt.savefig(f"../plots/emissions_time_series_{language}_{dataset}_{phase}.png")
@@ -469,7 +477,7 @@ def plot_time_series_all_algorithms(
 
 
 def plot_execution_time_by_language(
-    df, language_col, algorithm_col, time_col, type_col, selected_algorithm, title
+        df, language_col, algorithm_col, time_col, type_col, selected_algorithm, title
 ):
     # Filter the DataFrame based on the selected algorithm
     filtered_df = df[df[algorithm_col] == selected_algorithm]
@@ -528,8 +536,8 @@ def plot_time_series_subplot(df, combinations, date_col, value_col, phase_col="p
     num_combinations = len(combinations)
     num_cols = 2  # Number of columns for subplots
     num_rows = (
-        num_combinations + num_cols - 1
-    ) // num_cols  # Calculate number of rows needed
+                       num_combinations + num_cols - 1
+               ) // num_cols  # Calculate number of rows needed
 
     fig, axes = plt.subplots(
         nrows=num_rows, ncols=num_cols, figsize=(15, 5 * num_rows), sharex=True
@@ -542,7 +550,7 @@ def plot_time_series_subplot(df, combinations, date_col, value_col, phase_col="p
             (df["language"] == language)
             & (df["dataset"] == dataset)
             & (df["algorithm"] == algorithm)
-        ].copy()  # Create a copy to avoid SettingWithCopyWarning
+            ].copy()  # Create a copy to avoid SettingWithCopyWarning
 
         if df_filtered.empty:
             print(
@@ -605,7 +613,7 @@ def plot_time_series_subplot(df, combinations, date_col, value_col, phase_col="p
 df = load_dataset("../data/meanEmissions.csv")
 df_raw = load_dataset("raw_merged_emissions.csv")
 df_clean = remove_outliers(df)
-
+"""
 plot_execution_time_by_language_and_algorithm(
     df,
     "language",
@@ -629,7 +637,7 @@ plot_execution_time_by_language_and_algorithm(
 )
 
 plot_performance_heatmap(df, "language", "algorithm", "energy_consumed")
-"""
+
 plot_execution_time_by_dataset(df, 'dataset', 'emissions', 'language')
 
 plot_correlation_by_phase(df, 'cpu_energy', 'emissions', 'phase', 'language',
@@ -642,9 +650,9 @@ plot_correlation_by_phase(df_raw, 'cpu_energy', 'emissions', 'phase', 'language'
 
 plot_correlation_by_phase(df_raw, 'cpu_energy', 'duration', 'phase', 'language',
                           title_prefix="Correlation_by_Phase_time_raw")
-
-plot_time_series(df_raw, 'matlab', 'breastCancer', 'randomForest', 'timestamp', 'cpu_energy')
-
+"""
+plot_time_series_all_algorithms(df_raw, 'R', 'timestamp', 'energy_consumed')
+"""
 plot_execution_time_by_language(df, 'language', 'algorithm', 'cpu_energy', 'phase', "KNN",
                                 "CPU energy "
                                 "distribution by language")
